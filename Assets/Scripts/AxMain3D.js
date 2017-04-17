@@ -38,7 +38,5 @@ function Update () {
  	}
  	*/
 
- 	// Keystrokes
- 	if (Input.GetKey("escape"))
-    	Application.Quit();
+ 	
 }
