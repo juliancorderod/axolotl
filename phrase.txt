@@ -1,8 +1,12 @@
+emotion
+anger
+water
 word
 blue
 flower
-inside the tank
-floating here
-water
+inside
+floating
 loud
 angry
+less
+forgotten
