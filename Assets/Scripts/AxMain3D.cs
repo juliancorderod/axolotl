@@ -4,9 +4,6 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-
-
-
 public class AxMain3D : MonoBehaviour {
 	public GameObject MainCamera;
 	public GameObject TankCamera;
@@ -257,8 +254,8 @@ public class AxMain3D : MonoBehaviour {
 		string[] allPhrases = new string[10];
 
 		// populate the template and phrase  arrays
-		ReadFile("template.txt", allTmps);
-	    ReadFile("phrase.txt", allPhrases);
+		ReadFile("Assets/template.txt", allTmps);
+	    ReadFile("Assets/phrase.txt", allPhrases);
 		
 	    // Set up the text for Days
 	    for (int i=0;i<10;i++) 
