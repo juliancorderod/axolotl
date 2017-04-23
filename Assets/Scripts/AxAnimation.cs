@@ -13,8 +13,8 @@ public class AxAnimation : MonoBehaviour {
 	void Update () {
 		// ambient movement/animation
 			// axolotl bob
-		transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y+(Mathf.Sin(Time.time)/400), transform.localPosition.z);
-		transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y+(Mathf.Sin(Time.time)/400), transform.localPosition.z);
+		transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y+(Mathf.Sin(Time.time* 0.5f)/600), transform.localPosition.z);
+		transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y+(Mathf.Sin(Time.time * 0.5f)/600), transform.localPosition.z);
 		
 	}
 }
