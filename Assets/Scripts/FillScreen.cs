@@ -14,13 +14,13 @@ public class FillScreen : MonoBehaviour {
 	//override these values in the inspector.
 	[SerializeField] float spriteX = 1980f;
 	[SerializeField] float spriteY = 1080f;
+	[SerializeField] Camera myCamera;
 
 	void Start () {
-		Camera myCamera = Camera.main;
-		float zDiff = Vector3.Distance (myCamera.transform.position, this.transform.position);
+		float zDiff = myCamera.transform.position.z - this.transform.position.z;
 		Sprite mySprite = this.GetComponent<SpriteRenderer> ().sprite;
 
-		float height = 2* zDiff * Mathf.Tan (Mathf.Deg2Rad * myCamera.fieldOfView / 2f);
+		float height = Mathf.Abs (2 * zDiff * Mathf.Tan (Mathf.Deg2Rad * myCamera.fieldOfView / 2f));
 		Vector2 sizeFactor = new Vector2 (height * myCamera.aspect, height);
 		sizeFactor *= mySprite.pixelsPerUnit;
 
