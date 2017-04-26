@@ -18,14 +18,17 @@ public class AxMain3D : MonoBehaviour {
 
 	public float fadeTime = 0.01f;
 
-    List<string> todaysTemplate; 
+    List<List<string>> todaysTemplate;
+    List<int> todaysSentences;
+    List<int[]> blankMarkers;
+
     List<string> completedText;
     Day[] allDays = new Day[10];
     GameObject[] dayObjs = new GameObject[10];
 	Color guiColor = Color.grey;
 	string currentPhrases = "", currentTemplate = "", gameState = "intro"; // gameState = intro, startDay, active, inter, endDay
 	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f;
-    int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 1; 
+    int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 0, currentSent = 0; 
 	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, closeToGlass = false, transOnce = false;
 	
 	public class Phrase {
@@ -59,9 +62,13 @@ public class AxMain3D : MonoBehaviour {
 
 		public Day(string tmp, string phs) { // constructor
 			dayTemplates = new List<string>();
-			this.dayTemplates.Add(tmp);
-			//for (int i=0; i<temps.Length; i++) 
-				//this.dayTemplates.Add(templateDB[temps[i]]);
+			
+			string[] tsp = tmp.Split('|');			
+			for (int i=0; i<tsp.Length; i++) 
+				this.dayTemplates.Add(tsp[i]);
+			
+			
+			//this.dayTemplates.Add(tmp);
 
 			dayPhrases = new List<Phrase>();
 			dayPhrasesActive = new List<Phrase>();
@@ -145,21 +152,26 @@ public class AxMain3D : MonoBehaviour {
 		}
 
 		for (int i=0; i<todaysTemplate.Count; i++) {
-			if (i % 2 != 0) { // odd numbered indices are variable
-				todaysTemplate[i] = todaysTemplate[i].ToLower();
-				if (i == currentIndex && textState == 1 && !releaseTyping) { // this is what we're editing
-					if (phraseMismatch) // trying to lock something in that's not an available phrase
-				 		currentTemplate += "[<color=#FF0000>" + todaysTemplate[i] + "</color>]";
-				 	else
-				 		currentTemplate += "[<color=#FFFF00>" + todaysTemplate[i] + "</color>]";
+			if (currentSent >= i) {
+				for (int j=0; j<todaysTemplate[i].Count; j++) {
+				
+					if (j % 2 != 0) { // odd numbered indices are variable
+						todaysTemplate[i][j] = todaysTemplate[i][j].ToLower();
+						if (i == currentIndex && textState == 1 && !releaseTyping) { // this is what we're editing
+							if (phraseMismatch) // trying to lock something in that's not an available phrase
+						 		currentTemplate += "[<color=#FF0000>" + todaysTemplate[i][j] + "</color>]";
+						 	else
+						 		currentTemplate += "[<color=#FFFF00>" + todaysTemplate[i][j] + "</color>]";
+						}
+						else if (todaysTemplate[i][j] != "___")
+							currentTemplate += "<color=#87B7C7>" + todaysTemplate[i][j] + "</color>";
+						else
+							currentTemplate += "<color=#ABABAB>" + todaysTemplate[i][j] + "</color>";
+					}
+					else
+						currentTemplate += todaysTemplate[i][j];
 				}
-				else if (todaysTemplate[i] != "___")
-					currentTemplate += "<color=#87B7C7>" + todaysTemplate[i] + "</color>";
-				else
-					currentTemplate += "<color=#ABABAB>" + todaysTemplate[i] + "</color>";
 			}
-			else
-				currentTemplate += todaysTemplate[i];
 		}
 		
 
@@ -182,7 +194,7 @@ public class AxMain3D : MonoBehaviour {
     	//return false;
     	bool foundMatch = false;
     	for (int i=0; i<allDays[(currentDay-1)].dayPhrasesActive.Count; i++) {
-			if (allDays[(currentDay-1)].dayPhrasesActive[i].text == todaysTemplate[currentIndex]) {
+			if (allDays[(currentDay-1)].dayPhrasesActive[i].text == todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]]) {
 				foundMatch = true;
 				break;
 			}
@@ -193,21 +205,21 @@ public class AxMain3D : MonoBehaviour {
     void EnterText(KeyCode ltr) {
     	phraseMismatch = false;
     	if (ltr >= KeyCode.A && ltr <= KeyCode.Z) { // we only accept alphabetical characters
-    		todaysTemplate[currentIndex] += ltr;
+    		todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] += ltr;
     	}
-    	else if (ltr == KeyCode.Backspace && todaysTemplate[currentIndex].Length > 0) {
-    		todaysTemplate[currentIndex] = todaysTemplate[currentIndex].Substring(0, todaysTemplate[currentIndex].Length - 1);
+    	else if (ltr == KeyCode.Backspace && todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Length > 0) {
+    		todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] = todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Substring(0, todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Length - 1);
     	}
     	else if(ltr == KeyCode.Return) {
-    		if (todaysTemplate[currentIndex].Length == 0) {
+    		if (todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Length == 0) {
     			releaseTyping = true;
-    			todaysTemplate[currentIndex] = "___";
+    			todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] = "___";
     		}
 	   		else { // attempt to lock text in
 	   			if (CheckPhraseMatch()) {
 	   				
 	    			for (int i=0; i<allDays[(currentDay-1)].dayPhrasesActive.Count; i++) {
-						if (allDays[(currentDay-1)].dayPhrasesActive[i].text == todaysTemplate[currentIndex]) {
+						if (allDays[(currentDay-1)].dayPhrasesActive[i].text == todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]]) {
 							allDays[(currentDay-1)].dayPhrasesActive.RemoveAt(i);
 							break;
 						}
@@ -229,28 +241,39 @@ public class AxMain3D : MonoBehaviour {
     }
 
 	void NewDayUpdate() {
-		todaysTemplate = new List<string>();
+		todaysTemplate = new List<List<string>>();
+		todaysSentences = new List<int>(); // markers for where sentences end
+		blankMarkers = new List<int[]>();
+
 		dayStart = 0.0f;
 		string curStr = "";
 		int numEntries = 0;
 		currentIndex = 1;
+		currentSent = 0;
 		templateComplete = false;
 		textState = -1;
 		MainCamera.GetComponent<Camera>().orthographicSize = 4.5f;
 		for (int i=0; i<allDays[(currentDay-1)].dayTemplates.Count; i++) { // count the number of phrases in template
+			numEntries = 0;
+			todaysTemplate.Add(new List<string>());
 			for (int j=0; j<allDays[(currentDay-1)].dayTemplates[i].Length;j++) {
 				if (allDays[(currentDay-1)].dayTemplates[i][j] == '_') {
-					todaysTemplate.Add(curStr);
-					todaysTemplate.Add("___");
+					todaysTemplate[i].Add(curStr);
+					todaysTemplate[i].Add("___");
 					curStr = "";
 					numEntries++;
+					blankMarkers.Add(new int[2]{i,(numEntries-1)});
 				}
 				else {
 					curStr += allDays[(currentDay-1)].dayTemplates[i][j];
 				}
 				if (j == allDays[(currentDay-1)].dayTemplates[i].Length-1)
-					todaysTemplate.Add(curStr);
+					todaysTemplate[i].Add(curStr);
 			}
+		}
+
+		for (int k=0;k<blankMarkers.Count;k++) {
+			print(blankMarkers[k][0]+","+blankMarkers[k][1]);
 		}
 
 		// Change alpha of tankQuad
@@ -494,7 +517,7 @@ public class AxMain3D : MonoBehaviour {
 		if (Input.GetKeyUp("return") && textState == 0 && !templateComplete) {
 			// entering typing mode
 			textState = 1;
-			todaysTemplate[currentIndex] = "";
+			todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] = "";
 			UpdateStrings();
 		}
 
