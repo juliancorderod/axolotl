@@ -16,20 +16,23 @@ public class AxMain3D : MonoBehaviour {
 	public RenderTexture rTexture;
 	public GameObject TankQuad;
 
+	public float fadeTime = 0.01f;
+
     List<string> todaysTemplate; 
     List<string> completedText;
     Day[] allDays = new Day[10];
     GameObject[] dayObjs = new GameObject[10];
-    int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 1; 
-	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f, fadeTime = 0.01f;
 	Color guiColor = Color.grey;
 	string currentPhrases = "", currentTemplate = "", gameState = "intro"; // gameState = intro, startDay, active, inter, endDay
+	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f;
+    int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 1; 
 	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, closeToGlass = false, transOnce = false;
 	
 	public class Phrase {
 		public string triggerType;
 		public string triggerVal;
 		public string text;
+		public bool wasTriggered;
 		public Phrase(string trigg, string val, string txt) { // constructor
 			if (trigg == "T") // triggered after time passes
 				triggerType = "time";
@@ -39,6 +42,7 @@ public class AxMain3D : MonoBehaviour {
 				triggerType = "always";				
 			triggerVal = val;
 			text = txt;
+			wasTriggered = false;
 		}
 
 		public void DebugPhrase() {
@@ -159,6 +163,19 @@ public class AxMain3D : MonoBehaviour {
 		}
 		
 
+    }
+
+    public bool TriggerScenePhrase(string phraseID) {
+    	if (gameState == "active") {
+	    	for (int i=0; i<allDays[(currentDay-1)].dayPhrases.Count; i++) {
+	    		if (allDays[(currentDay-1)].dayPhrases[i].triggerType == "scene" && allDays[(currentDay-1)].dayPhrases[i].triggerVal == phraseID && !allDays[(currentDay-1)].dayPhrases[i].wasTriggered) {
+	    			allDays[(currentDay-1)].dayPhrases[i].wasTriggered = true;
+	    			allDays[(currentDay-1)].dayPhrasesActive.Add(allDays[(currentDay-1)].dayPhrases[i]);
+	    			return true;
+	    		}
+	    	}	
+    	}	
+    	return false;
     }
 
     bool CheckPhraseMatch() {
