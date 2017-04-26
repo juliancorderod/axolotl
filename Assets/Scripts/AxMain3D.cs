@@ -7,9 +7,11 @@ using UnityEngine;
 public class AxMain3D : MonoBehaviour {
 	public GameObject MainCamera;
 	public GameObject TankCamera;
+	public GameObject InterCamera;
 	public GameObject FaceGroup;
 	public GameObject AllDays;
 	public GameObject FadeSquare;
+	public GameObject InterFadeSquare;
 	
 	public Material TankMat;
 	public RenderTexture rTexture;
@@ -24,13 +26,33 @@ public class AxMain3D : MonoBehaviour {
     int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentPhrase = 0, currentIndex = 1; 
 	float lastShowDay = 0.0f;
 	Color guiColor = Color.grey;
-	string currentEntry = " ", currentPhrases = "", currentTemplate = "", gameState = "intro"; // gameState = intro, startDay, active, endDay
-	bool releaseTyping = false, templateComplete = false, phraseMismatch = false;
+	string currentEntry = " ", currentPhrases = "", currentTemplate = "", gameState = "intro"; // gameState = intro, startDay, active, inter, endDay
+	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, closeToGlass = false, transOnce = false;
 	
+	public class Phrase {
+		public string triggerType;
+		public string triggerVal;
+		public string text;
+		public Phrase(string trigg, string txt, string val) { // constructor
+			if (trigg == "T") // triggered after time passes
+				triggerType = "time";
+			else if (trigg == "S") // triggered by a specific scene trigger
+				triggerType = "scene";
+			triggerVal = val;
+			text = txt;
+		}
+
+		public void DebugPhrase() {
+			print(triggerType+","+triggerVal+","+text);
+		}
+
+	}
+
 
 	public class Day {
 		public List<string> dayTemplates;
-		public List<string> dayPhrases;
+		public List<Phrase> dayPhrases;
+		public List<Phrase> dayPhrasesActive;
 
 		public Day(string tmp, string phs) { // constructor
 			dayTemplates = new List<string>();
@@ -38,18 +60,20 @@ public class AxMain3D : MonoBehaviour {
 			//for (int i=0; i<temps.Length; i++) 
 				//this.dayTemplates.Add(templateDB[temps[i]]);
 
-			dayPhrases = new List<string>();
-			string[] psp = phs.Split(',');
-			for (int i=0; i<psp.Length; i++) 
-				this.dayPhrases.Add(psp[i]);
+			dayPhrases = new List<Phrase>();
+			string[] psp = phs.Split('|');			
+			for (int i=0; i<psp.Length; i++) {
+				string[] php = psp[i].Split(','); 
+				this.dayPhrases.Add(new Phrase(php[0],php[1],php[2]));
+			}
+			
 		}
-
 		public void DebugDay() {
 			foreach (var v in this.dayTemplates) {
     			print(v);
 			}
-			foreach (var v in this.dayPhrases) {
-    			print(v);
+			foreach (var p in this.dayPhrases) {
+    			p.DebugPhrase();
 			}
 
 		}
@@ -133,7 +157,7 @@ public class AxMain3D : MonoBehaviour {
     	//return false;
     	bool foundMatch = false;
     	for (int i=0; i<allDays[(currentDay-1)].dayPhrases.Count; i++) {
-			if (allDays[(currentDay-1)].dayPhrases[i] == todaysTemplate[currentIndex]) {
+			if (allDays[(currentDay-1)].dayPhrases[i].text == todaysTemplate[currentIndex]) {
 				foundMatch = true;
 				break;
 			}
@@ -158,7 +182,7 @@ public class AxMain3D : MonoBehaviour {
 	   			if (CheckPhraseMatch()) {
 	   				
 	    			for (int i=0; i<allDays[(currentDay-1)].dayPhrases.Count; i++) {
-						if (allDays[(currentDay-1)].dayPhrases[i] == todaysTemplate[currentIndex]) {
+						if (allDays[(currentDay-1)].dayPhrases[i].text == todaysTemplate[currentIndex]) {
 							allDays[(currentDay-1)].dayPhrases.RemoveAt(i);
 							break;
 						}
@@ -261,6 +285,10 @@ public class AxMain3D : MonoBehaviour {
 	    for (int i=0;i<10;i++) 
 	    	allDays[i] = new Day(allTmps[i],allPhrases[i]);
 		NewDayUpdate();
+		DebugAllDays();
+
+		MainCamera.SetActive(true);
+		InterCamera.SetActive(false);
 		
 	}	
 
@@ -280,7 +308,7 @@ public class AxMain3D : MonoBehaviour {
 			GUI.skin.label.fontSize = 15;
 			GUI.Label(new Rect(Screen.width-250, Screen.height-30, 200, 200), "(Press ESC to exit)");	
 		}
-		else {
+		else if (gameState == "active" && !closeToGlass) {
 
 			if (Time.time - lastShowDay < 2 && gameState == "active") {
 				GUI.skin.label.fontSize = 14;
@@ -337,7 +365,7 @@ public class AxMain3D : MonoBehaviour {
 		}
 
 		// x-axis camera movement
-		if (Input.mousePosition.x > 0 && Input.mousePosition.x < (Screen.width-5)) { // only allow mouse movements that are within game window
+		if (Input.mousePosition.x > 0 && Input.mousePosition.x < (Screen.width-5) && gameState == "active") { // only allow mouse movements that are within game window
 
 			// Move front box left and right at same speed of mouse x axis (higher divisor is, the slower it moves)
 			if(Input.GetAxis("Mouse X") != 0) {
@@ -354,8 +382,10 @@ public class AxMain3D : MonoBehaviour {
 			if (MainCamera.GetComponent<Camera>().orthographicSize > 3) {
 				MainCamera.GetComponent<Camera>().orthographicSize = MainCamera.GetComponent<Camera>().orthographicSize - (float)0.05;
 			}
-			else
+			else {
+				//closeToGlass = true;
 				zMove = 2;
+			}
 
 		}
 		else if (zMove == -1) { // stepping back from the glass
@@ -363,23 +393,57 @@ public class AxMain3D : MonoBehaviour {
 		
 			if (MainCamera.GetComponent<Camera>().orthographicSize < 4.5) 
 				MainCamera.GetComponent<Camera>().orthographicSize = MainCamera.GetComponent<Camera>().orthographicSize + (float)0.05;
-			else
+			else {
 				zMove = 0;
+				closeToGlass = false;
+			}
 				
 			
 		}
-		else if (zMove == 3) { // fading scene out
+		else if (zMove == 3) { // fading scene out to interstitial
 			if (FadeSquare.GetComponent<SpriteRenderer>().color.a < 1) {
-				//MainCamera.transform.localRotation = new Quaternion(MainCamera.transform.localRotation.x, MainCamera.transform.localRotation.y-(float)0.005, MainCamera.transform.localRotation.z, MainCamera.transform.localRotation.w);	
 				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a+(float)0.02);
 			}
 			else {
-				if (gameState != "outro") {
-					gameState = "startDay";
+
+				// end game checks here
+
+				MainCamera.SetActive(false);
+				InterCamera.SetActive(true);
+				//gameState = "inter";
+
+				if (InterFadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
+					InterFadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,InterFadeSquare.GetComponent<SpriteRenderer>().color.a-(float)0.02);
+				}
+				else { // done
+					templateComplete = false;
 					zMove = 0;
-					NewDayUpdate();	
+					gameState = "inter";
+
+				}
+			}
+		}
+		else if (zMove == 4) { // fading out from intersitial to next day
+			if (InterFadeSquare.GetComponent<SpriteRenderer>().color.a < 1) {
+				InterFadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,InterFadeSquare.GetComponent<SpriteRenderer>().color.a+(float)0.02);
+			}
+			else {
+				if (!transOnce) {
+					InterCamera.SetActive(false);
+					MainCamera.SetActive(true);
+					NewDayUpdate();
+					transOnce = true;		
 				}
 				
+				if (FadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
+					FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a-(float)0.02);
+				}
+				else { // done 
+					gameState = "startDay";
+					zMove = 0;
+					transOnce = false;
+
+				}
 			}
 		}
 
@@ -404,13 +468,17 @@ public class AxMain3D : MonoBehaviour {
     	else if (Input.GetKeyUp("e") && gameState == "intro") { 
 	    	gameState = "startDay";
     	}
+    	else if (Input.GetKeyUp("e") && gameState == "inter") {
+    		zMove = 4; 
+    	}
 	    
     	if (textState != 1) { // only if we're not typing something
-	    	if (Input.GetKey("w") && zMove == 0) {
+	    	if (Input.GetKey("w") && zMove == 0 && !closeToGlass) {
 	    		SendAction("stepFoward");
 	    		zMove = 1;
+	    		closeToGlass = true;
 	    	}
-			if (Input.GetKey("s") && zMove == 2) {
+			if (Input.GetKey("s") && zMove == 2 && closeToGlass) {
 	    		SendAction("stepBack");
 	    		zMove = -1;    		
 			}
@@ -445,6 +513,5 @@ public class AxMain3D : MonoBehaviour {
 			textState = 0;
 			releaseTyping = false;
 		}
-
 	}
 }
