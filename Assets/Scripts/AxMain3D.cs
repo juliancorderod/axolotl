@@ -27,6 +27,10 @@ public class AxMain3D : MonoBehaviour {
 	string currentEntry = " ", currentPhrases = "", currentTemplate = "", gameState = "intro"; // gameState = intro, startDay, active, endDay
 	bool releaseTyping = false, templateComplete = false, phraseMismatch = false;
 	
+	[SerializeField] float mainCameraMove = 1f / 200f;
+	[SerializeField] float tankCameraMove = 1f / 200f;
+	[SerializeField] float faceMove = 1f / 100;
+	[SerializeField] float allDaysMove = 1f / 50f;
 
 	public class Day {
 		public List<string> dayTemplates;
@@ -341,10 +345,10 @@ public class AxMain3D : MonoBehaviour {
 
 			// Move front box left and right at same speed of mouse x axis (higher divisor is, the slower it moves)
 			if(Input.GetAxis("Mouse X") != 0) {
-				MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x + Input.GetAxis("Mouse X")/200, MainCamera.transform.localPosition.y, MainCamera.transform.localPosition.z);	
-				TankCamera.transform.localPosition = new Vector3(TankCamera.transform.localPosition.x + Input.GetAxis("Mouse X")/200, TankCamera.transform.localPosition.y, TankCamera.transform.localPosition.z);					
-				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x - Input.GetAxis("Mouse X")/100, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
-				AllDays.transform.localPosition = new Vector3(AllDays.transform.localPosition.x + Input.GetAxis("Mouse X")/50, AllDays.transform.localPosition.y, AllDays.transform.localPosition.z);	
+				MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x + Input.GetAxis("Mouse X") * mainCameraMove, MainCamera.transform.localPosition.y, MainCamera.transform.localPosition.z);	
+				TankCamera.transform.localPosition = new Vector3(TankCamera.transform.localPosition.x + Input.GetAxis("Mouse X") * tankCameraMove, TankCamera.transform.localPosition.y, TankCamera.transform.localPosition.z);					
+				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x - Input.GetAxis("Mouse X") * faceMove, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
+				AllDays.transform.localPosition = new Vector3(AllDays.transform.localPosition.x + Input.GetAxis("Mouse X") * allDaysMove, AllDays.transform.localPosition.y, AllDays.transform.localPosition.z);	
 			}
 	
 		}
