@@ -1,4 +1,4 @@
-T,2,locked|T,5,judged|T,8,panicked|T,10,stared|S,1,stayed
+A,0,ran|A,0,jumped|A,0,drank|A,0,floated|A,0,grimaced|T,5,spoke|T,7,sat|C,9,stared|T,11,waved|T,20,wondered|T,25,reflected|C,25,unraveled
 T,3,angry|T,3,happy|T,9,bright|T,11,lonely
 A,0,stones|A,0,coral|T,2,plants|T,2,animals|T,7,seaweed|T,7,creatures
 T,3,animals|T,5,creatures|T,10,you
