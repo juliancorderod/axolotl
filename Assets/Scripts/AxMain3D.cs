@@ -528,13 +528,15 @@ public class AxMain3D : MonoBehaviour {
 				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a+fadeTime);
 			}
 			else {
+				if (!transOnce) {
+					transOnce = true;
+					transform.GetComponent<audioManager>().playCig();
+					transform.GetComponent<audioManager>().playSmokeAmbient();
 
-				// end game checks here
-
-				MainCamera.SetActive(false);
-				InterCamera.SetActive(true);
-				//gameState = "inter";
-
+					MainCamera.SetActive(false);
+					InterCamera.SetActive(true);
+				}
+		
 				if (InterFadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
 					InterFadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,InterFadeSquare.GetComponent<SpriteRenderer>().color.a-fadeTime);
 				}
@@ -542,6 +544,7 @@ public class AxMain3D : MonoBehaviour {
 					templateComplete = false;
 					zMove = 0;
 					gameState = "inter";
+					transOnce = false;
 
 				}
 			}
@@ -552,6 +555,8 @@ public class AxMain3D : MonoBehaviour {
 			}
 			else {
 				if (!transOnce) {
+					transform.GetComponent<audioManager>().stopCig();
+					transform.GetComponent<audioManager>().stopSmokeAmbient();
 					InterCamera.SetActive(false);
 					MainCamera.SetActive(true);
 					NewDayUpdate();
@@ -621,7 +626,8 @@ public class AxMain3D : MonoBehaviour {
     		UpdateStrings();
     	}
     	else if (Input.GetKeyUp("e") && gameState == "intro") { 
-    		// sound trigger (aquarium)
+    		transform.GetComponent<audioManager>().playTankBubbles();
+    		transform.GetComponent<audioManager>().playTankAmbient();
 	    	gameState = "startDay";
     	}
     	else if (Input.GetKeyUp("e") && gameState == "inter") {
@@ -641,8 +647,10 @@ public class AxMain3D : MonoBehaviour {
 			}
 	    	if (Input.GetKeyUp("e")) { 
 	    		if (templateComplete && currentDay < maxDays) {
-		    		// sound triggger (walking away)
-		    		zMove = 3;
+					transform.GetComponent<audioManager>().stopTankBubbles();
+    				transform.GetComponent<audioManager>().stopTankAmbient();
+    				transform.GetComponent<audioManager>().playWalking();
+    				zMove = 3;
 		    		currentDay = currentDay + 1;
 		    		lastShowDay = Time.time;
 		    		gameState = "endDay";
