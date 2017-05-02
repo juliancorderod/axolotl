@@ -72,7 +72,7 @@ public class audioManager : MonoBehaviour {
 		toFadeIn.Add(new AxSound(tankBubbles, 0.01f, 0.4f));
 	}
 	public void stopTankBubbles(){
-		toFadeOut.Add(new AxSound(tankBubbles, 0.05f, 0.0f));
+		toFadeOut.Add(new AxSound(tankBubbles, 0.005f, 0.0f));
 	}
 
 	public void playTankAmbient(){
@@ -81,12 +81,12 @@ public class audioManager : MonoBehaviour {
 		toFadeIn.Add(new AxSound(tankAmbient, 0.001f, 0.4f));
 	}
 	public void stopTankAmbient(){
-		toFadeOut.Add(new AxSound(tankAmbient, 0.05f, 0.0f));
+		toFadeOut.Add(new AxSound(tankAmbient, 0.005f, 0.0f));
 	}
 	public void closeToTank() {
 		tmpA = tankAmbient.volume;
 		tmpB = tankBubbles.volume;
-		tankAmbient.volume = 0.05f;
+		tankAmbient.volume = 0.025f;
 		tankBubbles.volume = 1.0f;
 	}
 	public void awayFromTank() {
@@ -99,18 +99,18 @@ public class audioManager : MonoBehaviour {
 	public void playCig(){
 		cigBurn.volume = 0.0f;
 		cigBurn.Play();
-		toFadeIn.Add(new AxSound(cigBurn, 0.001f, 0.5f));
+		toFadeIn.Add(new AxSound(cigBurn, 0.004f, 0.5f));
 	}
 	public void stopCig() {
-		toFadeOut.Add(new AxSound(cigBurn, 0.05f, 0.0f));
+		toFadeOut.Add(new AxSound(cigBurn, 0.0009f, 0.0f));
 	}
 	public void playSmokeAmbient(){
 		smokeRoomAmbient.volume = 0.0f;
 		smokeRoomAmbient.Play();
-		toFadeIn.Add(new AxSound(smokeRoomAmbient, 0.001f, 0.4f));
+		toFadeIn.Add(new AxSound(smokeRoomAmbient, 0.004f, 0.4f));
 	}
 	public void stopSmokeAmbient() {
-		toFadeOut.Add(new AxSound(smokeRoomAmbient, 0.05f, 0.0f));
+		toFadeOut.Add(new AxSound(smokeRoomAmbient, 0.0009f, 0.0f));
 	}
 
 
