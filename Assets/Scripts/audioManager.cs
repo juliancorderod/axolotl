@@ -10,103 +10,108 @@ public class audioManager : MonoBehaviour {
 	public AudioSource standUpCloseDoor;//must play once when fading out of tankScene , max volume = 1;
 
 	//smokescene
-	public AudioSource lightCig;//must play once before fading into smokescene, max volume = 1
+	//public AudioSource lightCig;//must play once before fading into smokescene, max volume = 1
 	public AudioSource cigBurn;//must loop after lightCig plays, max volume = 1
 	public AudioSource smokeRoomAmbient;//must fadein when fading into smokescene, fadeout when fading out of smokescene, must loop, max volume 0.5f
 
-	public float fadeVal;
+	List<AxSound> toFadeIn;
+	List<AxSound> toFadeOut;
+	
+	float tmpA = 0.0f;
+	float tmpB = 0.0f;
 
-	public bool testStart;
-	public bool testStop;
+	public class AxSound {
+		public AudioSource aSource;
+		public float fadeVal;
+		public float fadeTarget;
 
-	string fade = "";
-	//float t = 0;
+		public AxSound(AudioSource aus, float fv, float ft) { // constructor
+			aSource = aus;
+			fadeVal = fv;
+			fadeTarget = ft;
+		}
+	}
+
 	// Use this for initialization
 	void Start () {
-
-		//Debug.Log( tankAmbient.volume	);
+		toFadeIn = new List<AxSound>();
+		toFadeOut = new List<AxSound>();
 	}
 	
+	void FadeIn() {
+		for (int i=0;i<toFadeIn.Count;i++) {
+			toFadeIn[i].aSource.volume += toFadeIn[i].fadeVal;
+			if (toFadeIn[i].aSource.volume >= toFadeIn[i].fadeTarget) {
+				toFadeIn.RemoveAt(i);
+				i--;
+			}
+		}
+	}
+
+	void FadeOut() {
+		for (int i=0;i<toFadeOut.Count;i++) {
+			toFadeOut[i].aSource.volume -= toFadeOut[i].fadeVal;
+			if (toFadeOut[i].aSource.volume <= toFadeOut[i].fadeTarget) {
+				toFadeOut[i].aSource.Stop();
+				toFadeOut.RemoveAt(i);
+				i--;
+			}
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
-
-		if(Input.GetKeyDown(KeyCode.Space)){
-			testStart = true;
-		}
-		if(Input.GetKeyDown(KeyCode.Alpha1)){
-			testStop = true;
-		}
-
-		if(testStart){
-		//playTankAmbient();
-			playTankBubbles();
-			playTankAmbient();
-			testStart = false;
-		}
-		if(testStop){
-			//playTankAmbient();
-			stopTankBubbles();
-			stopTankAmbient();
-			testStop = false;
-		}
-
-
-		if (fade == "tankBubblesIn"){
-
-			if(tankBubbles.volume < 1){
-				tankBubbles.volume += fadeVal;
-			} else if(tankBubbles.volume >=1){
-				fade = "";
-			}
-		}
-		if (fade == "tankBubblesOut"){
-
-			if(tankBubbles.volume > 0){
-				tankBubbles.volume -= fadeVal;
-			} else if(tankBubbles.volume <=0){
-				fade = "";
-				tankBubbles.Stop();
-			}
-		}
-
-		if (fade == "tankAmbientIn"){
-
-			if(tankAmbient.volume < 1){
-				tankAmbient.volume += fadeVal;
-			} else if(tankAmbient.volume >=1){
-				fade = "";
-			}
-		}
-		if (fade == "tankAmbientOut"){
-
-			if(tankAmbient.volume > 0){
-				tankAmbient.volume -= fadeVal;
-			} else if(tankAmbient.volume <=0){
-				fade = "";
-				tankAmbient.Stop();
-			}
-		}
-
+		FadeIn();
+		FadeOut();
 	}
 
-
+	// AxSound syntax = audioSource, fadeAmt, targetVol
 	public void playTankBubbles(){
+		tankBubbles.volume = 0.0f;
 		tankBubbles.Play();
-		fade = "tankBubblesIn";
+		toFadeIn.Add(new AxSound(tankBubbles, 0.01f, 0.4f));
 	}
 	public void stopTankBubbles(){
-		fade = "tankBubblesOut";
+		toFadeOut.Add(new AxSound(tankBubbles, 0.005f, 0.0f));
 	}
-
 
 	public void playTankAmbient(){
+		tankAmbient.volume = 0.0f;
 		tankAmbient.Play();
-		fade = "tankAmbientIn";
+		toFadeIn.Add(new AxSound(tankAmbient, 0.001f, 0.4f));
 	}
 	public void stopTankAmbient(){
-		fade = "tankAmbientOut";
+		toFadeOut.Add(new AxSound(tankAmbient, 0.005f, 0.0f));
 	}
-
+	public void closeToTank() {
+		tmpA = tankAmbient.volume;
+		tmpB = tankBubbles.volume;
+		tankAmbient.volume = 0.025f;
+		tankBubbles.volume = 1.0f;
+	}
+	public void awayFromTank() {
+		tankAmbient.volume = tmpA;
+		tankBubbles.volume = tmpB;
+	}
+	public void playWalking(){
+		standUpCloseDoor.Play();
+	}
+	public void playCig(){
+		cigBurn.volume = 0.0f;
+		cigBurn.Play();
+		toFadeIn.Add(new AxSound(cigBurn, 0.004f, 0.5f));
+	}
+	public void stopCig() {
+		toFadeOut.Add(new AxSound(cigBurn, 0.0009f, 0.0f));
+	}
+	public void playSmokeAmbient(){
+		smokeRoomAmbient.volume = 0.0f;
+		smokeRoomAmbient.Play();
+		toFadeIn.Add(new AxSound(smokeRoomAmbient, 0.004f, 0.4f));
+	}
+	public void stopSmokeAmbient() {
+		toFadeOut.Add(new AxSound(smokeRoomAmbient, 0.0009f, 0.0f));
+	}
 
 
 
