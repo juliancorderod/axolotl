@@ -16,9 +16,10 @@ public class AxMain3D : MonoBehaviour {
 	public RenderTexture rTexture;
 	public GameObject TankQuad;
 
-	public GUIStyle AxMainTextStyle;
-
-	public float fadeTime = 0.01f;
+	public float fadeOutTime = 0.001f;
+	public float fadeInTime = 0.005f;
+	public float waitTankToInter = 0.5f;
+	public float waitInterToTank = 0.5f;
 	public int startDay = 1;
 
     List<List<string>> todaysTemplate;
@@ -28,8 +29,8 @@ public class AxMain3D : MonoBehaviour {
     Day[] allDays = new Day[10];
     GameObject[] dayObjs = new GameObject[10];
 	Color guiColor = Color.grey;
-	string currentPhrases = "", currentTemplate = "", gameState = "intro", introText = "", outroText = ""; // gameState = intro, startDay, active, inter, endDay
-	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f;
+	string currentPhrases = "", currentTemplate = "", gameState = "title", introText = "", outroText = ""; // gameState = title, intro, startDay, active, inter, endDay
+	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f, stareTime = 0.0f, holdTime = 0.0f, faceResetX = 0.0f;
     int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 0, currentSent = 0, todaysBlanks, currentBlankInSent; 
 	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, closeToGlass = false, transOnce = false, needsEntry = false;
 	
@@ -44,16 +45,13 @@ public class AxMain3D : MonoBehaviour {
 			else if (trigg == "S") // triggered by a specific scene trigger
 				triggerType = "scene";
 			else if (trigg == "A") // always available
-				triggerType = "always";				
+				triggerType = "always";
+			else if (trigg == "C") // always available
+				triggerType = "close";				
 			triggerVal = val;
 			text = txt;
 			wasTriggered = false;
 		}
-
-		public void DebugPhrase() {
-			print(triggerType+","+triggerVal+","+text);
-		}
-
 	}
 
 
@@ -69,52 +67,19 @@ public class AxMain3D : MonoBehaviour {
 			for (int i=0; i<tsp.Length; i++) 
 				this.dayTemplates.Add(tsp[i]);
 			
-			
-			/*for (int i=0;i<dayTemplates.Count;i++) {
-				print(dayTemplates[i]);
-			}*/
-			
-
-
-
-			//this.dayTemplates.Add(tmp);
-
 			dayPhrases = new List<Phrase>();
 			dayPhrasesActive = new List<Phrase>();
 			string[] psp = phs.Split('|');			
 			for (int i=0; i<psp.Length; i++) {
 				string[] php = psp[i].Split(','); 
-				if (php[0] == "A") // always available, add right to active
+				if (php[0] == "A") // always available, add directly to active
 					this.dayPhrasesActive.Add(new Phrase(php[0],php[1],php[2]));
 				else
 					this.dayPhrases.Add(new Phrase(php[0],php[1],php[2]));
 	
-			}
-			
+			}	
 		}
-		public void DebugDay() {
-			foreach (var v in this.dayTemplates) {
-    			print(v);
-			}
-			foreach (var p in this.dayPhrases) {
-    			p.DebugPhrase();
-			}
-
-		}
-
 	}
-
-    void DebugList(List<string> l) {
-    	foreach (var v in l) {
-    		print(v);
-		}
-    }
-
-    void DebugAllDays() {
-    	for (int i=0;i<10;i++) {
-    		allDays[i].DebugDay();
-    	}
-    }
 
     void ReadFile(string fn, string[] ar) {
     	try {
@@ -164,9 +129,8 @@ public class AxMain3D : MonoBehaviour {
 
 
 		if (!templateComplete) {
-			for (int i=0; i<allDays[(currentDay-1)].dayPhrasesActive.Count; i++) {
+			for (int i=0; i<allDays[(currentDay-1)].dayPhrasesActive.Count; i++) 
 				currentPhrases += allDays[(currentDay-1)].dayPhrasesActive[i].text + "\r\n";
-			}
 		}
 
 		for (int i=0; i<todaysTemplate.Count; i++) {
@@ -193,20 +157,6 @@ public class AxMain3D : MonoBehaviour {
 				currentTemplate += "\n";
 			}
 		}
-
-		// Debug blankMarkers
-		/*print(currentIndex+" , "+todaysBlanks);
-		for (int k=0;k<blankMarkers.Count;k++) {
-			print(blankMarkers[k][0]+","+blankMarkers[k][1]);
-		}*/
-		
-		/*print("----");
-		for (int j=0;j<todaysTemplate.Count;j++) {
-			for (int k=0;k<todaysTemplate[j].Count;k++) {
-				print(todaysTemplate[j][k]);
-			}
-		}*/
-
     }
 
     public bool TriggerScenePhrase(string phraseID) {
@@ -264,7 +214,6 @@ public class AxMain3D : MonoBehaviour {
 	    				currentBlankInSent = 0;	
 	    			}
 	    			
-	    			//if (currentIndex >= todaysTemplate[blankMarkers[currentIndex][0]].Count) {
 	    			if (currentIndex >= todaysBlanks) {
 	    				templateComplete = true;
 	    				currentIndex--;
@@ -280,23 +229,24 @@ public class AxMain3D : MonoBehaviour {
     }
 
 	void NewDayUpdate() {
-		todaysTemplate = new List<List<string>>();
-		blanksPerSentence = new List<int>();
-		todaysBlanks = 0;
-		blankMarkers = new List<int[]>();
-
-		dayStart = 0.0f;
 		string curStr = "";
 		int numEntries = 0;
 		int numBlanks = 0;
+
+		todaysTemplate = new List<List<string>>();
+		blanksPerSentence = new List<int>();
+		blankMarkers = new List<int[]>();
+		todaysBlanks = 0;
+		dayStart = 0.0f;
 		currentIndex = 0;
 		currentSent = 0;
 		templateComplete = false;
 		needsEntry = false;
 		textState = -1;
 		currentBlankInSent = 0;
-
 		MainCamera.GetComponent<Camera>().orthographicSize = 4.5f;
+		FaceGroup.transform.localPosition = new Vector3(faceResetX, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
+		FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,1f);
 		for (int i=0; i<allDays[(currentDay-1)].dayTemplates.Count; i++) { // count the number of phrases in template
 			numEntries = 0;
 			numBlanks = 0;
@@ -325,24 +275,6 @@ public class AxMain3D : MonoBehaviour {
 			blanksPerSentence.Add(numBlanks);
 		}
 
-		// Debug blanks
-		/*for (int k=0;k<blanksPerSentence.Count;k++) {
-			print(blanksPerSentence[k]);
-		}*/
-
-		//blankMarkers.Add(new int[2]{0,0});
-		// Debug blankMarkers
-		/*for (int k=0;k<blankMarkers.Count;k++) {
-			print(blankMarkers[k][0]+","+blankMarkers[k][1]);
-		}*/
-
-		// Debug todaysTemplate
-		/*for (int i=0;i<todaysTemplate.Count;i++) {
-			for (int j=0;j<todaysTemplate[i].Count;j++) {
-				print(todaysTemplate[i][j]);
-			}
-		}*/
-
 		// Change alpha of tankQuad
 		Color color = TankMat.color;
 		color.a = 1.0f-(0.05f*currentDay);
@@ -363,7 +295,7 @@ public class AxMain3D : MonoBehaviour {
 			TankQuad.transform.localPosition = new Vector3(TankQuad.transform.localPosition.x, TankQuad.transform.localPosition.y, (float)-3.5);	
 		}
 
-		// disable all childen
+		// disable all ALLDAYS children
 		foreach(Transform child in AllDays.transform)
 		{
 			child.gameObject.SetActive(false);
@@ -376,11 +308,11 @@ public class AxMain3D : MonoBehaviour {
 	}
 
 	void Start () {
+
 		// turn all days on so we can add them to the array
 		foreach(Transform child in AllDays.transform)
-		{
 			child.gameObject.SetActive(true);
-		}
+	
 
 		// add all days to dayObjs array for quicker access, then turn them off
 		for (int i=0;i<10;i++) {
@@ -392,7 +324,7 @@ public class AxMain3D : MonoBehaviour {
 		string[] allTmps = new string[12];
 		string[] allPhrases = new string[10];
 		currentDay = startDay;
-
+		faceResetX = FaceGroup.transform.localPosition.x;
 		// populate the template and phrase arrays
 		ReadFile("Assets/template.txt", allTmps);
 	    ReadFile("Assets/phrase.txt", allPhrases);
@@ -404,8 +336,8 @@ public class AxMain3D : MonoBehaviour {
 	    	allDays[i] = new Day(allTmps[i+1],allPhrases[i],i+1);
 		NewDayUpdate();
 
-		MainCamera.SetActive(true);
-		InterCamera.SetActive(false);
+		MainCamera.SetActive(false);
+		InterCamera.SetActive(true);
 		
 	}	
 
@@ -414,12 +346,22 @@ public class AxMain3D : MonoBehaviour {
 		centeredStyle.alignment = TextAnchor.UpperLeft;
 
 		GUI.color = guiColor;
-		if (gameState == "intro") {
+		if (gameState == "title" && zMove == 0) {
+			guiColor = Color.white;
+			GUI.skin.label.fontSize = 36;
+			GUI.Label(new Rect((Screen.width/6), (Screen.height/2), 600, 300), "The Axolotl");	
+
+			GUI.skin.label.fontSize = 15;
+			GUI.Label(new Rect(Screen.width-135, Screen.height-30, 200, 200), "[ Enter to Begin ]");	
+
+		}
+		else if (gameState == "intro") {
 			GUI.skin.label.fontSize = 18;
 			GUI.Label(new Rect((Screen.width/4), Screen.height-300, 600, 300), introText);	
 
 			GUI.skin.label.fontSize = 15;
-			GUI.Label(new Rect(Screen.width-35, Screen.height-30, 200, 200), "[ E ]");	
+			GUI.Label(new Rect(Screen.width/4, Screen.height-200, 400, 200), "(Move the mouse to look left and right)\n(Press Space to Toggle Zoom)\n(Press Enter to Advance)");	
+
 		}
 		else if (gameState == "outro") {
 			GUI.skin.label.fontSize = 18;
@@ -454,7 +396,7 @@ public class AxMain3D : MonoBehaviour {
 				
 				GUI.skin.label.fontSize = 15;
 				if (templateComplete) 
-					GUI.Label(new Rect(Screen.width-75, Screen.height-30, 200, 200), "[ E ] -->");	
+					GUI.Label(new Rect(Screen.width-105, Screen.height-30, 200, 200), "[ Enter ] -->");	
 				else if (textState == 1) {
 					//GUI.Label(new Rect(Screen.width-250, Screen.height-30, 200, 200), "(Press Enter when finished)");	
 				}
@@ -463,20 +405,20 @@ public class AxMain3D : MonoBehaviour {
 					if (needsEntry)
 						GUI.Label(new Rect(Screen.width-60, Screen.height-30, 200, 200), "[ Enter ]");	
 					else
-						GUI.Label(new Rect(Screen.width-35, Screen.height-30, 200, 200), "[ E ]");	
+						GUI.Label(new Rect(Screen.width-60, Screen.height-30, 200, 200), "[ Enter ]");	
 				}
 				
 
 			}
 			else if (textState == -1) {
 				GUI.skin.label.fontSize = 15;
-				GUI.Label(new Rect(Screen.width-35, Screen.height-30, 200, 200), "[ E ]");	
+				GUI.Label(new Rect(Screen.width-60, Screen.height-30, 200, 200), "[ Enter ]");	
 			}
 		}
 		else if (gameState == "inter" && zMove != 4) {
 			guiColor = Color.grey;
 			GUI.skin.label.fontSize = 15;
-			GUI.Label(new Rect(Screen.width-35, Screen.height-30, 30, 30), "[ E ]");	
+			GUI.Label(new Rect(Screen.width-60, Screen.height-30, 200, 200), "[ Enter ]");	
 		}
 	}
 	
@@ -484,7 +426,7 @@ public class AxMain3D : MonoBehaviour {
 		if (gameState == "startDay") {
 			guiColor = Color.Lerp(Color.black, Color.grey, Time.time);
 			if (FadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
-				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a-fadeTime);
+				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a-fadeInTime);
 			}
 			else {
 				gameState = "active";
@@ -502,13 +444,11 @@ public class AxMain3D : MonoBehaviour {
 		// z-axis camera movement
 		if (zMove == 1) { // stepping toward the glass
 			
-			if (MainCamera.GetComponent<Camera>().orthographicSize > 3) {
+			if (MainCamera.GetComponent<Camera>().orthographicSize > 3) 
 				MainCamera.GetComponent<Camera>().orthographicSize = MainCamera.GetComponent<Camera>().orthographicSize - (float)0.05;
-			}
-			else {
-				//closeToGlass = true;
+			
+			else 
 				zMove = 2;
-			}
 
 		}
 		else if (zMove == -1) { // stepping back from the glass
@@ -525,47 +465,61 @@ public class AxMain3D : MonoBehaviour {
 		}
 		else if (zMove == 3) { // fading scene out to interstitial
 			if (FadeSquare.GetComponent<SpriteRenderer>().color.a < 1) {
-				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a+fadeTime);
+				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a+fadeOutTime);
 			}
+
+			if (FaceGroup.transform.localPosition.x < 12) { 
+				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x + (float)0.02, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
+				FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,FaceGroup.GetComponent<SpriteRenderer>().color.a-(float)0.001);
+			}
+
 			else {
-
-				// end game checks here
-
-				MainCamera.SetActive(false);
-				InterCamera.SetActive(true);
-				//gameState = "inter";
-
-				if (InterFadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
-					InterFadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,InterFadeSquare.GetComponent<SpriteRenderer>().color.a-fadeTime);
-				}
-				else { // done
-					templateComplete = false;
-					zMove = 0;
-					gameState = "inter";
-
+				if (Time.time - holdTime >= waitTankToInter) {
+					if (!transOnce) {
+						transOnce = true;
+						transform.GetComponent<audioManager>().playCig();
+						transform.GetComponent<audioManager>().playSmokeAmbient();
+						MainCamera.SetActive(false);
+						InterCamera.SetActive(true);
+					}
+					
+					if (InterFadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
+						InterFadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,InterFadeSquare.GetComponent<SpriteRenderer>().color.a-fadeInTime);
+					}
+					else { // done
+						templateComplete = false;
+						zMove = 0;
+						gameState = "inter";
+						transOnce = false;
+						holdTime = 0.0f;
+					}
 				}
 			}
 		}
 		else if (zMove == 4) { // fading out from intersitial to next day
 			if (InterFadeSquare.GetComponent<SpriteRenderer>().color.a < 1) {
-				InterFadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,InterFadeSquare.GetComponent<SpriteRenderer>().color.a+fadeTime);
+				InterFadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,InterFadeSquare.GetComponent<SpriteRenderer>().color.a+fadeOutTime);
 			}
 			else {
-				if (!transOnce) {
-					InterCamera.SetActive(false);
-					MainCamera.SetActive(true);
-					NewDayUpdate();
-					transOnce = true;		
-				}
-				
-				if (FadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
-					FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a-(float)0.02);
-				}
-				else { // done 
-					gameState = "startDay";
-					zMove = 0;
-					transOnce = false;
-
+				if (Time.time - holdTime >= waitInterToTank) {
+					if (!transOnce) {
+						
+						InterCamera.SetActive(false);
+						MainCamera.SetActive(true);
+						NewDayUpdate();
+						transOnce = true;
+						transform.GetComponent<audioManager>().playTankBubbles();
+    					transform.GetComponent<audioManager>().playTankAmbient();		
+					}
+					
+					if (FadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
+						FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a-(float)0.02);
+					}
+					else { // done 
+						gameState = "startDay";
+						zMove = 0;
+						transOnce = false;
+					}
 				}
 			}
 		}
@@ -574,8 +528,26 @@ public class AxMain3D : MonoBehaviour {
 				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x + (float)0.05, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
 				FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,FaceGroup.GetComponent<SpriteRenderer>().color.a-(float)0.01);
 			}
-			else ;
-			
+			else { // end-game triggers
+
+			}
+		}
+		else if (zMove == 6) { // fade from title to intro
+			if (InterFadeSquare.GetComponent<SpriteRenderer>().color.a < 1) {
+				InterFadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,InterFadeSquare.GetComponent<SpriteRenderer>().color.a+fadeInTime);
+			}
+			else {
+				if (!transOnce) {
+					InterCamera.SetActive(false);
+					MainCamera.SetActive(true);
+					transOnce = true;		
+				}
+					
+				gameState = "intro";
+				zMove = 0;
+				transOnce = false;	
+			}
+
 		}
 
 		// Check for time-based word additions
@@ -587,11 +559,13 @@ public class AxMain3D : MonoBehaviour {
 					i--;
 					UpdateStrings();
 				}
-				/* debugging timer
-				else if (allDays[(currentDay-1)].dayPhrases[i].triggerType == "time") {
-					print(allDays[(currentDay-1)].dayPhrases[i].triggerType +","+allDays[(currentDay-1)].dayPhrases[i].triggerVal+","+allDays[(currentDay-1)].dayPhrases[i].text + " | " + (Time.time - dayStart) + ",(" + dayStart + ")");
+				else if (stareTime != 0.0 && allDays[(currentDay-1)].dayPhrases[i].triggerType == "close" && float.Parse(allDays[(currentDay-1)].dayPhrases[i].triggerVal) <= (Time.time - stareTime)) {
+					// add sound notifier of new word?
+					allDays[(currentDay-1)].dayPhrasesActive.Add(allDays[(currentDay-1)].dayPhrases[i]);
+					allDays[(currentDay-1)].dayPhrases.RemoveAt(i);
+					i--;
+					UpdateStrings();
 				}
-				*/
 			}
 			lastTickCheck = Time.time;
 		}
@@ -610,39 +584,52 @@ public class AxMain3D : MonoBehaviour {
 
  		
 		
-		if (Input.GetKeyUp("e") && textState == -1 && gameState == "active") { 
+		if (Input.GetKeyUp("return") && textState == -1 && gameState == "active") { 
 	    	textState = 0;
 	    	UpdateStrings();
 	    	if (dayStart == 0.0)
 	    		dayStart = Time.time;
     	}
-    	else if (Input.GetKeyUp("e") && textState == 0 && gameState == "active" && !needsEntry) { 
+    	else if (Input.GetKeyUp("return") && textState == 0 && gameState == "active" && !needsEntry) { 
     		currentSent++;
     		UpdateStrings();
     	}
-    	else if (Input.GetKeyUp("e") && gameState == "intro") { 
-    		// sound trigger (aquarium)
+    	else if (Input.GetKeyUp("return") && gameState == "intro") { 
+    		transform.GetComponent<audioManager>().playTankBubbles();
+    		transform.GetComponent<audioManager>().playTankAmbient();
 	    	gameState = "startDay";
     	}
-    	else if (Input.GetKeyUp("e") && gameState == "inter") {
-    		// sound trigger (aquarium)
+    	else if (Input.GetKeyUp("return") && gameState == "inter") {
     		zMove = 4; 
+    		holdTime = Time.time;
+    		transform.GetComponent<audioManager>().stopCig();
+			transform.GetComponent<audioManager>().stopSmokeAmbient();
     	}
-	    
+	    else if (Input.GetKeyUp("return") && gameState == "title") {
+    		zMove = 6; 
+    	}
+
     	if (textState != 1) { // only if we're not typing something
-	    	if (Input.GetKey("w") && zMove == 0 && !closeToGlass && gameState == "active") {
+	    	if (Input.GetKey("space") && zMove == 0 && !closeToGlass && gameState == "active") {
 	    		SendAction("stepFoward");
 	    		zMove = 1;
 	    		closeToGlass = true;
+	    		stareTime = Time.time;
+	    		transform.GetComponent<audioManager>().closeToTank();
 	    	}
-			if (Input.GetKey("s") && zMove == 2 && closeToGlass && gameState == "active") {
+			if (Input.GetKey("space") && zMove == 2 && closeToGlass && gameState == "active") {
 	    		SendAction("stepBack");
 	    		zMove = -1;    		
+	    		transform.GetComponent<audioManager>().awayFromTank();
+	    		stareTime = 0.0f;
 			}
-	    	if (Input.GetKeyUp("e")) { 
+	    	if (Input.GetKeyUp("return")) { 
 	    		if (templateComplete && currentDay < maxDays) {
-		    		// sound triggger (walking away)
+		    		transform.GetComponent<audioManager>().stopTankBubbles();
+    				transform.GetComponent<audioManager>().stopTankAmbient();
+    				transform.GetComponent<audioManager>().playWalking();
 		    		zMove = 3;
+		    		holdTime = Time.time;
 		    		currentDay = currentDay + 1;
 		    		lastShowDay = Time.time;
 		    		gameState = "endDay";
@@ -653,7 +640,6 @@ public class AxMain3D : MonoBehaviour {
 	    		}
 	    	}
 		}
-
 
 	    if (Input.GetKeyUp(",")) { // DEBUG move day backward
 			zMove = 3;
@@ -671,7 +657,6 @@ public class AxMain3D : MonoBehaviour {
 		if (releaseTyping) {
 			textState = 0;
 			releaseTyping = false;
-
 		}
 	}
 }
