@@ -20,6 +20,8 @@ public class MouseParallax : MonoBehaviour {
 	float faceGroupStartPos;
 	float allDaysStartPos;
 
+	public bool mouseParalaxControl = true;
+
 	// Use this for initialization
 	void Start () {
 		Cursor.lockState = CursorLockMode.Confined;
@@ -34,25 +36,27 @@ public class MouseParallax : MonoBehaviour {
 	void Update () {
 		float paralaxPosition = RangeReMap (Input.mousePosition.x, 0f, Screen.width, -1, 1);
 
-		MainCamera.transform.localPosition = new Vector3 (
-			mainCamStartPos + (paralaxPosition * mainCamModifier),
-			MainCamera.transform.localPosition.y,
-			MainCamera.transform.localPosition.z);
+		if (mouseParalaxControl == true) {
+			MainCamera.transform.localPosition = new Vector3 (
+				mainCamStartPos + (paralaxPosition * mainCamModifier),
+				MainCamera.transform.localPosition.y,
+				MainCamera.transform.localPosition.z);
 
-		TankCamera.transform.localPosition = new Vector3 (
-			tankCamStartPos + (paralaxPosition * tankCamModifier),
-			TankCamera.transform.localPosition.y,
-			TankCamera.transform.localPosition.z);				
+			TankCamera.transform.localPosition = new Vector3 (
+				tankCamStartPos + (paralaxPosition * tankCamModifier),
+				TankCamera.transform.localPosition.y,
+				TankCamera.transform.localPosition.z);				
 
-		FaceGroup.transform.localPosition = new Vector3 (
-			faceGroupStartPos + (paralaxPosition * faceGroupModifier),
-			FaceGroup.transform.localPosition.y,
-			FaceGroup.transform.localPosition.z);	
+			FaceGroup.transform.localPosition = new Vector3 (
+				faceGroupStartPos + (paralaxPosition * faceGroupModifier),
+				FaceGroup.transform.localPosition.y,
+				FaceGroup.transform.localPosition.z);	
 
-		AllDays.transform.localPosition = new Vector3 (
-			allDaysStartPos + (paralaxPosition * allDaysModifier),
-			AllDays.transform.localPosition.y,
-			AllDays.transform.localPosition.z);	
+			AllDays.transform.localPosition = new Vector3 (
+				allDaysStartPos + (paralaxPosition * allDaysModifier),
+				AllDays.transform.localPosition.y,
+				AllDays.transform.localPosition.z);	
+		}
 	}
 
 	float RangeReMap (float value, float from1, float to1, float from2, float to2) {
