@@ -20,7 +20,7 @@ public class MouseParallax : MonoBehaviour {
 	float faceGroupStartPos;
 	float allDaysStartPos;
 
-	public bool mouseParalaxControl = true;
+	public bool mouseParallaxControl = true;
 
 	// Use this for initialization
 	void Start () {
@@ -36,7 +36,7 @@ public class MouseParallax : MonoBehaviour {
 	void Update () {
 		float paralaxPosition = RangeReMap (Input.mousePosition.x, 0f, Screen.width, -1, 1);
 
-		if (mouseParalaxControl == true) {
+		if (mouseParallaxControl == true) {
 			MainCamera.transform.localPosition = new Vector3 (
 				mainCamStartPos + (paralaxPosition * mainCamModifier),
 				MainCamera.transform.localPosition.y,
