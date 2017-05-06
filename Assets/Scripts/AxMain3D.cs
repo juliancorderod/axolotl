@@ -30,7 +30,7 @@ public class AxMain3D : MonoBehaviour {
     GameObject[] dayObjs = new GameObject[10];
 	Color guiColor = Color.grey;
 	string currentPhrases = "", currentTemplate = "", gameState = "title", introText = "", outroText = ""; // gameState = title, intro, startDay, active, inter, endDay
-	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f, stareTime = 0.0f, holdTime = 0.0f, faceResetX = 0.0f;
+	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f, stareTime = 0.0f, holdTime = 0.0f, faceResetX = 0.0f, camResetX = 0.0f;
     int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 0, currentSent = 0, todaysBlanks, currentBlankInSent; 
 	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, closeToGlass = false, transOnce = false, needsEntry = false;
 	
@@ -247,6 +247,7 @@ public class AxMain3D : MonoBehaviour {
 		MainCamera.GetComponent<Camera>().orthographicSize = 4.5f;
 		FaceGroup.transform.localPosition = new Vector3(faceResetX, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
 		FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,1f);
+		MainCamera.transform.localPosition = new Vector3(camResetX, MainCamera.transform.localPosition.y, MainCamera.transform.localPosition.z);	
 		for (int i=0; i<allDays[(currentDay-1)].dayTemplates.Count; i++) { // count the number of phrases in template
 			numEntries = 0;
 			numBlanks = 0;
@@ -325,6 +326,7 @@ public class AxMain3D : MonoBehaviour {
 		string[] allPhrases = new string[10];
 		currentDay = startDay;
 		faceResetX = FaceGroup.transform.localPosition.x;
+		camResetX = MainCamera.transform.localPosition.x;
 		// populate the template and phrase arrays
 		ReadFile("Assets/template.txt", allTmps);
 	    ReadFile("Assets/phrase.txt", allPhrases);
@@ -464,15 +466,19 @@ public class AxMain3D : MonoBehaviour {
 			
 		}
 		else if (zMove == 3) { // fading scene out to interstitial
-			if (FadeSquare.GetComponent<SpriteRenderer>().color.a < 1) {
-				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a+fadeOutTime);
-			}
 
-			if (FaceGroup.transform.localPosition.x < 12) { 
+			if (FaceGroup.transform.localPosition.x < 12) { // face walking
 				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x + (float)0.02, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
 				FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,FaceGroup.GetComponent<SpriteRenderer>().color.a-(float)0.001);
 			}
 
+			if (MainCamera.transform.localPosition.x < 12) { 
+				MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x + (float)0.02, MainCamera.transform.localPosition.y, MainCamera.transform.localPosition.z);	
+			}
+
+			if (FadeSquare.GetComponent<SpriteRenderer>().color.a < 1) {
+				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a+fadeOutTime);
+			}
 			else {
 				if (Time.time - holdTime >= waitTankToInter) {
 					if (!transOnce) {
@@ -604,6 +610,8 @@ public class AxMain3D : MonoBehaviour {
     		holdTime = Time.time;
     		transform.GetComponent<audioManager>().stopCig();
 			transform.GetComponent<audioManager>().stopSmokeAmbient();
+			transform.GetComponent<MouseParallax>().mouseParallaxControl = true;
+
     	}
 	    else if (Input.GetKeyUp("return") && gameState == "title") {
     		zMove = 6; 
@@ -624,7 +632,7 @@ public class AxMain3D : MonoBehaviour {
 	    		stareTime = 0.0f;
 			}
 	    	if (Input.GetKeyUp("return")) { 
-	    		if (templateComplete && currentDay < maxDays) {
+	    		if (templateComplete && currentDay < maxDays) { // exiting day -> interstitial
 		    		transform.GetComponent<audioManager>().stopTankBubbles();
     				transform.GetComponent<audioManager>().stopTankAmbient();
     				transform.GetComponent<audioManager>().playWalking();
@@ -633,10 +641,14 @@ public class AxMain3D : MonoBehaviour {
 		    		currentDay = currentDay + 1;
 		    		lastShowDay = Time.time;
 		    		gameState = "endDay";
+		    		transform.GetComponent<MouseParallax>().mouseParallaxControl = false;
+
 	    		}
 	    		else if (templateComplete && currentDay == maxDays) {
+	    			transform.GetComponent<MouseParallax>().mouseParallaxControl = false;
 	    			zMove = 5;
 	    			gameState = "outro";
+
 	    		}
 	    	}
 		}
