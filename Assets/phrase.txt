@@ -1,10 +1,10 @@
-A,0,ran|A,0,jumped|A,0,drank|A,0,floated|A,0,grimaced|T,5,spoke|T,7,sat|C,9,stared|T,11,waved|T,20,wondered|T,25,reflected|C,25,unraveled
-T,3,angry|T,3,happy|T,9,bright|T,11,lonely
-A,0,stones|A,0,coral|T,2,plants|T,2,animals|T,7,seaweed|T,7,creatures
-T,3,animals|T,5,creatures|T,10,you
-T,3,dark|T,5,big|T,7,small|T,8,lost|T,8,empty|T,10,questioned|T,11,focused
-A,0,people|A,0,creatures|T,3,tanks|T,6,exhibits
-A,0,eyes|T,2,gills|T,4,face|T,4,shape|T,4,glare|T,4,loneliness
-A,0,world|T,2,feelings|T,6,views|T,7,emotions|T,9,loneliness|T,10,affection
-A,0,space|T,2,glass|T,2,air|T,2,water|T,2,distance
-A,0,me|A,0,us
+A,0,ran|A,0,jumped|A,0,drank|S,1,floated|A,5,grimaced|T,7,spoke|T,9,sat|C,9,stared|S,2,waved|T,25,wondered|T,30,reflected|C,20,unraveled
+A,0,mischievous|T,3,happy|T,9,productive|T,11,jittery|T,12,bright|S,1,stoic|S,2,soulless|C,15,homeless|T,16,confused|T,17,frail|C,18,hopeless|T,18,hungry
+S,1,salty|S,2,pungent|A,0,chewy|T,7,fast|T,9,furious|T,13,curly|S,3,heavy|T,17,lonely|T,20,empty|C,30,dull|S,4,sinking|T,25,enclosed
+S,1,grasses|S,2,coral|S,3,seaweed|T,5,oceans|T,8,animals|T,12,creatures|T,15,people|T,20,they|C,10,reflections|C,15,You|C,15,I
+S,1,sticky|A,0,curious|A,0,dark|A,0,big|S,2,small|T,5,googly|T,8,reflective|S,3,carefree|C,5,bitter|T,12,lost|S,4,desolate|T,15,focused|T,17,unsettling|C,10,real
+A,0,squishy|A,0,fast|S,1,tall|A,0,nice|T,5,calm|T,8,watched|S,2,small|T,10,at ease|C,5,anxious|C,8,caged|C,13,buried|S,3,deserted|T,14,detached
+A,0,hands|A,0,freckles|A,0,shape|T,5,softness|T,7,gills|T,10,eyes|T,12,face|T,14,glare|T,16,emotionless face|C,5,stillness|C,8,turmoil
+C,3,affections|C,5,worlds|C,10,feelings|C,14,views|C,17,panic|C,22,desperation
+C,3,space|C,5,glass|C,9,air|C,14,water|C,20,distance
+C,0,me|C,0,us|C,0,me
