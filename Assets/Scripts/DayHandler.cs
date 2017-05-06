@@ -90,27 +90,25 @@ public class DayHandler : MonoBehaviour {
 	void Update () {
 		for (int i=0; i<sceneObjs.Count; i++) {	
 			//if (Mathf.Abs(sceneObjs[i].oRef.transform.position.x-sceneObjs[i].oPos.x) >= sceneObjs[i].oXThresh && sceneObjs[i].oAtGlass == lookingAtGlass)
-			float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
-
-			if (paralaxPosition <= sceneObjs [i].oXMax &&
-			    paralaxPosition >= sceneObjs [i].oXMin &&
-			    sceneObjs [i].oAtGlass == lookingAtGlass) {
-
-				//Ensures the sendPhaseTrigger is called only once.
-				if (sceneObjs [i].oHoverTime >= 0f) {
-					sceneObjs [i].oHoverTime += Time.deltaTime / 5f;
-				}
-
-				if (sceneObjs [i].oHoverTime >= 1f) {
-					//Ensures the sendPhaseTrigger is called only once.
-					sceneObjs [i].oHoverTime = -5f;
-					SendPhraseTrigger (sceneObjs [i].oID);
-				}
-			} else {
-				sceneObjs [i].oHoverTime = 0;
-			}
-
 			if (sceneObjs [i].oHoverTime != -5f) {
+				float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
+
+				if (paralaxPosition <= sceneObjs [i].oXMax &&
+				    paralaxPosition >= sceneObjs [i].oXMin &&
+				    sceneObjs [i].oAtGlass == lookingAtGlass) {
+
+					//Debug.Log (sceneObjs [i].oHoverTime);
+					sceneObjs [i].oHoverTime += Time.deltaTime / 5f;
+
+					if (sceneObjs [i].oHoverTime >= 1f) {
+						//Ensures the sendPhaseTrigger is called only once.
+						SendPhraseTrigger (sceneObjs [i].oID);
+						sceneObjs [i].oHoverTime = -5f;
+					}
+				} else {
+					sceneObjs [i].oHoverTime = 0;
+				}
+
 				sceneObjs [i].oGlow.color = Color.Lerp (new Color (1f, 1f, 1f, 0f), new Color (1f, 1f, 1f, 0.9f), sceneObjs [i].oHoverTime);
 			} else {
 				sceneObjs [i].oGlow.color = new Color (1f, 1f, 1f, 0f);

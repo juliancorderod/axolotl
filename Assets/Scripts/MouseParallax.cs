@@ -38,7 +38,7 @@ public class MouseParallax : MonoBehaviour {
 		//Also the mouse.x is clamped to be between 0 and game screen width. So now the paralax we see
 		//in the unity window is representative of the final game.
 		float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
-		Debug.Log (paralaxPosition);
+		//Debug.Log (paralaxPosition);
 		//Debug.Log ("X: " + Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) + ", VP: " + (Mathf.Clamp (Input.mousePosition.x, 0, Screen.width)/Screen.width) + ", pP: " + paralaxPosition);
 
 		if (mouseParallaxControl == true) {
