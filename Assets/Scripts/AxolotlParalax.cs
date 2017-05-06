@@ -15,15 +15,11 @@ public class AxolotlParalax : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		float paralaxPosition = RangeReMap (Input.mousePosition.x, 0f, Screen.width, -1, 1);
+		float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
 
 		this.transform.position = new Vector3 (
 			startPos + (paralaxPosition * mp.axolotlModifier),
 			transform.position.y,
 			transform.position.z);
-	}
-
-	float RangeReMap (float value, float from1, float to1, float from2, float to2) {
-		return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
 }
