@@ -34,7 +34,12 @@ public class MouseParallax : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		float paralaxPosition = RangeReMap (Input.mousePosition.x, 0f, Screen.width, -1, 1);
+		//Takes the mouse position relative to the width of the screen and maps it to a range from -1 to 1
+		//Also the mouse.x is clamped to be between 0 and game screen width. So now the paralax we see
+		//in the unity window is representative of the final game.
+		float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
+		Debug.Log (paralaxPosition);
+		//Debug.Log ("X: " + Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) + ", VP: " + (Mathf.Clamp (Input.mousePosition.x, 0, Screen.width)/Screen.width) + ", pP: " + paralaxPosition);
 
 		if (mouseParallaxControl == true) {
 			MainCamera.transform.localPosition = new Vector3 (
@@ -57,9 +62,5 @@ public class MouseParallax : MonoBehaviour {
 				AllDays.transform.localPosition.y,
 				AllDays.transform.localPosition.z);	
 		}
-	}
-
-	float RangeReMap (float value, float from1, float to1, float from2, float to2) {
-		return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
 }
