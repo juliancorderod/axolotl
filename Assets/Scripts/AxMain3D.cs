@@ -32,8 +32,9 @@ public class AxMain3D : MonoBehaviour {
 	string currentPhrases = "", currentTemplate = "", gameState = "title", introText = "", outroText = ""; // gameState = title, intro, startDay, active, inter, endDay
 	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f, stareTime = 0.0f, holdTime = 0.0f, faceResetX = 0.0f, camResetX = 0.0f;
     int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 0, currentSent = 0, todaysBlanks, currentBlankInSent; 
-	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, closeToGlass = false, transOnce = false, needsEntry = false;
-	
+	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, transOnce = false, needsEntry = false;
+	public bool closeToGlass = false;
+
 	public class Phrase {
 		public string triggerType;
 		public string triggerVal;
