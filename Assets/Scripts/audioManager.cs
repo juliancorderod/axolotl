@@ -14,6 +14,11 @@ public class audioManager : MonoBehaviour {
 	public AudioSource cigBurn;//must loop after lightCig plays, max volume = 1
 	public AudioSource smokeRoomAmbient;//must fadein when fading into smokescene, fadeout when fading out of smokescene, must loop, max volume 0.5f
 
+	public AudioSource chime1;
+	public AudioSource chime2;
+	public AudioSource chime3;
+	public AudioSource chime4;
+
 	List<AxSound> toFadeIn;
 	List<AxSound> toFadeOut;
 	
@@ -113,6 +118,24 @@ public class audioManager : MonoBehaviour {
 		toFadeOut.Add(new AxSound(smokeRoomAmbient, 0.0009f, 0.0f));
 	}
 
+	public void playChime() {
+
+		int whichChime = Random.Range(1,4);
+		switch (whichChime) {
+			case 1:
+				chime1.Play();
+				break;
+			case 2:
+				chime2.Play();
+				break;
+			case 3:
+				chime3.Play();
+				break;
+			case 4:
+				chime4.Play();
+				break;
+		}
+	}
 
 
 
