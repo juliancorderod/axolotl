@@ -52,7 +52,7 @@ public class DayHandler : MonoBehaviour {
 	public float sceneObjMax_5 = 1f;
 	public bool atGlass_5;
 
-	bool lookingAtGlass = false;
+	public bool lookingAtGlass = false;
 	List<SceneObj> sceneObjs;
 
 	// Called when the player steps forward
