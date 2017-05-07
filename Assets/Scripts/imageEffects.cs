@@ -92,7 +92,7 @@ public class imageEffects : MonoBehaviour {
 			gVal = Random.Range(-0.1f, 0.1f);
 			bVal = Random.Range(-0.1f, 0.1f);
 
-			Debug.Log(rVal);
+			//Debug.Log(rVal);
 			setRandomValues = false;
 		}
 		
