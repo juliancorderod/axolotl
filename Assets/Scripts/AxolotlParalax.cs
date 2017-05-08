@@ -17,9 +17,11 @@ public class AxolotlParalax : MonoBehaviour {
 	void Update () {
 		float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
 
-		this.transform.position = new Vector3 (
-			startPos + (paralaxPosition * mp.axolotlModifier),
-			transform.position.y,
-			transform.position.z);
+		if (mp.mouseParallaxControl) {
+			this.transform.position = new Vector3 (
+				startPos + (paralaxPosition * mp.axolotlModifier),
+				transform.position.y,
+				transform.position.z);
+		}
 	}
 }
