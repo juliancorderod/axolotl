@@ -599,6 +599,8 @@ public class AxMain3D : MonoBehaviour {
 					UI_storyR.SetActive(true);
 					UI_main.SetActive(false);
 					transOnce = true;
+					GameObject fb = GameObject.Find("/FarBackInsideAquarium");
+					fb.transform.GetComponent<BackgroundFadeIn>().GameEndScreenSetUp();
 				}
 
 				if (UI_storyL.GetComponent<UnityEngine.UI.Text>().color.a < 1)
@@ -764,7 +766,7 @@ public class AxMain3D : MonoBehaviour {
 		    		}
 
 		    		completedText.Add("\n");
-	    			if (currentDay == 7)
+	    			if (currentDay == 6)
 	    				dayBreak = completedText.Count;
 		    	}
 			}
