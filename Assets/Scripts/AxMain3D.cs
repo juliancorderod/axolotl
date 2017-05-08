@@ -145,7 +145,7 @@ public class AxMain3D : MonoBehaviour {
 					if (blankMarkers[currentIndex][0] == i && blankMarkers[currentIndex][1] == j)
 						checkent++;
 					if (IsBlank(i,j)) {
-						todaysTemplate[i][j] = todaysTemplate[i][j].ToLower();
+						//todaysTemplate[i][j] = todaysTemplate[i][j].ToLower();
 						if (blankMarkers[currentIndex][0] == i && blankMarkers[currentIndex][1] == j && textState == 1 && !releaseTyping) { // this is what we're editing
 							if (phraseMismatch) // trying to lock something in that's not an available phrase
 						 		currentTemplate += "[<color=#FF0000>" + todaysTemplate[i][j] + "</color>]";
@@ -212,11 +212,22 @@ public class AxMain3D : MonoBehaviour {
     	return instr;	
     }
 
-    void EnterText(KeyCode ltr) {
+    void EnterText(KeyCode ltr, bool withShift) {
     	phraseMismatch = false;
     	if (ltr >= KeyCode.A && ltr <= KeyCode.Z) { // we only accept alphabetical characters
-    		todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] += ltr;
+    		string postenter = "";
+    		if (withShift) {
+    			todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] += ltr;
+    		}
+    		else if (!withShift) {
+
+    			postenter = "" + ltr;
+    			postenter = postenter.ToLower();
+    			todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] += postenter;
+    		}
     	}
+    	else if (ltr == KeyCode.Space)
+    		todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] += " ";
     	else if (ltr == KeyCode.Backspace && todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Length > 0) {
     		todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] = todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Substring(0, todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Length - 1);
     	}
@@ -448,9 +459,13 @@ public class AxMain3D : MonoBehaviour {
 				GUI.Label(new Rect(Screen.width-100, Screen.height-200, 100, 600), currentPhrases);	*/
 
 				if (textState == 1) { // we're typing
+					bool wShift = false;
+					if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
+						wShift = true;
+					}
 					Event e = Event.current;
 		        	if (e.isKey && e.type == EventType.KeyUp) // key up
-		        		EnterText(e.keyCode);
+		        		EnterText(e.keyCode,wShift);
 				}
 				
 				GUI.skin.label.fontSize = 15;
@@ -675,16 +690,16 @@ public class AxMain3D : MonoBehaviour {
 			}
 
 			// imageEffects triggers
-			if (Time.time - dayStart >= 15 && !fxState[0]) { // fish (extra time accounting for fade-in)
+			if (Time.time - dayStart >= 20 && !fxState[0]) { // fish (extra time accounting for fade-in)
 				transform.GetComponent<imageEffects>().FishEyeOn(true);
 				fxState[0] = true;
 			}
 
-			if (Time.time - dayStart >= 30 && !fxState[1]) { // chrome
+			if (Time.time - dayStart >= 40 && !fxState[1]) { // chrome
 				transform.GetComponent<imageEffects>().ChromAbOn(true);
 				fxState[1] = true;
 			}
-			if (Time.time - dayStart >= 35 && !fxState[2]) { // glass
+			if (Time.time - dayStart >= 45 && !fxState[2]) { // glass
 				transform.GetComponent<imageEffects>().glassColorOn(true);
 				fxState[2] = true;
 			}
