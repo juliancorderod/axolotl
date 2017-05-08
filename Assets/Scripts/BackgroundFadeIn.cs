@@ -11,6 +11,12 @@ public class BackgroundFadeIn : MonoBehaviour {
 	SpriteRenderer[] backgroundSpriteRenderers;
 	List<float> alphas = new List<float>();
 
+
+	public void GameEndScreenSetUp() {
+		//Make all the Aquarium Background Fade out. 
+	}
+
+
 	// Use this for initialization
 	void Start () {
 		am = GameObject.Find ("AxMain").GetComponent<AxMain3D> ();
