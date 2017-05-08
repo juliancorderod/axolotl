@@ -11,9 +11,24 @@ public class BackgroundFadeIn : MonoBehaviour {
 	SpriteRenderer[] backgroundSpriteRenderers;
 	List<float> alphas = new List<float>();
 
+	bool turnOffUpdate = false;
 
-	public void GameEndScreenSetUp() {
-		//Make all the Aquarium Background Fade out. 
+	IEnumerator FadeBois () {
+		for (float f = 0f; f <= 1f; f += 0.1f) {
+			for (int i = 0; i < backgroundSpriteRenderers.Length; i++) {
+				backgroundSpriteRenderers [i].color =
+					Color.Lerp (
+						new Color (1f, 1f, 1f, alphas [i]),
+						new Color (1f, 1f, 1f, alphas [i] * 0.1f),
+						f);
+			}
+			yield return new WaitForSeconds (0.1f);
+		}
+	}
+
+	public IEnumerator GameEndScreenSetUp() {
+		//Make all the Aquarium Backgrounds Fade out. We know at this point they'll be zooemed out.
+		yield return StartCoroutine ("FadeBois");
 	}
 
 
