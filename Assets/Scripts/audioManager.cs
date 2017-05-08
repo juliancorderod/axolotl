@@ -41,6 +41,11 @@ public class audioManager : MonoBehaviour {
 	void Start () {
 		toFadeIn = new List<AxSound>();
 		toFadeOut = new List<AxSound>();
+
+		chime1.pitch = 0.55f;
+		chime2.pitch = 0.55f;
+		chime3.pitch = 0.55f;
+		chime4.pitch = 0.55f;
 	}
 	
 	void FadeIn() {

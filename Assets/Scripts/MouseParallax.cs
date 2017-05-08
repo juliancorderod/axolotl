@@ -9,16 +9,16 @@ public class MouseParallax : MonoBehaviour {
 	public GameObject FaceGroup;
 	public GameObject AllDays;
 
-	[SerializeField] float mainCamModifier = 1f / 200f;
-	[SerializeField] float tankCamModifier = 1f / 200f;
-	[SerializeField] float faceGroupModifier = 1f / 100f;
-	[SerializeField] float allDaysModifier = 1f / 50f;
+	public float mainCamModifier = 1f / 200f;
+	public float tankCamModifier = 1f / 200f;
+	public float faceGroupModifier = 1f / 100f;
+	public float allDaysModifier = 1f / 50f;
 	public float axolotlModifier = 0f;
 
-	float mainCamStartPos;
-	float tankCamStartPos;
-	float faceGroupStartPos;
-	float allDaysStartPos;
+	public float mainCamStartPos;
+	public float tankCamStartPos;
+	public float faceGroupStartPos;
+	public float allDaysStartPos;
 
 	public bool mouseParallaxControl = true;
 
