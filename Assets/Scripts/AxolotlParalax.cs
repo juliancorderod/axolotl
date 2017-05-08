@@ -5,12 +5,12 @@ using UnityEngine;
 public class AxolotlParalax : MonoBehaviour {
 
 	MouseParallax mp;
-	float startPos;
+	public float axStartPos;
 
 	// Use this for initialization
 	void Start () {
 		mp = GameObject.Find ("AxMain").GetComponent<MouseParallax> ();
-		startPos = transform.position.x;
+		axStartPos = transform.position.x;
 	}
 	
 	// Update is called once per frame
@@ -19,7 +19,7 @@ public class AxolotlParalax : MonoBehaviour {
 
 		if (mp.mouseParallaxControl) {
 			this.transform.position = new Vector3 (
-				startPos + (paralaxPosition * mp.axolotlModifier),
+				axStartPos + (paralaxPosition * mp.axolotlModifier),
 				transform.position.y,
 				transform.position.z);
 		}
