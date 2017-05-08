@@ -1,4 +1,4 @@
-A,0,ran|A,0,jumped|A,0,drank|S,1,floated|T,4,spoke|T,8,laughed|C,4,stared|S,2,waved|T,12,wondered|C,8,unraveled
+A,0,jumped|A,0,drank|S,1,floated|T,4,spoke|T,8,laughed|C,4,stared|S,2,waved|T,12,wondered|C,8,unraveled
 A,0,stupid|A,0,happy|T,4,jittery|S,1,stoic|S,2,soulless|C,5,homeless|T,10,confused|C,10,hopeless|T,14,hungry
 S,1,salty|S,2,pungent|A,0,chewy|A,0,furious|T,5,curly|S,3,heavy|T,10,lonely|C,8,empty|C,13,dull|S,4,sinking|T,16,enclosed
 S,1,grasses|S,2,coral|S,3,seaweed|A,0,oceans|T,4,animals|T,9,creatures|T,13,people|C,4,reflections|C,9,you|C,9,I
@@ -7,4 +7,4 @@ A,0,squishy|A,0,fast|S,1,tall|A,0,nice|T,5,calm|S,2,small|C,5,anxious|C,8,caged|
 A,0,hands|A,0,freckles|A,0,shape|T,5,softness|T,7,gills|T,10,eyes|T,12,face|T,14,glare|C,5,stillness|C,8,turmoil
 C,3,affections|C,5,worlds|C,10,feelings|C,14,views|C,17,panic|C,22,desperation
 C,3,space|C,5,glass|C,9,air|C,14,water|C,20,distance
-C,0,me|C,0,us|C,0,me
+C,7,me|C,7,us|C,7,me
