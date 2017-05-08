@@ -10,25 +10,46 @@ public class BackgroundFadeIn : MonoBehaviour {
 
 	SpriteRenderer[] backgroundSpriteRenderers;
 	List<float> alphas = new List<float>();
-
-	bool turnOffUpdate = false;
+	[SerializeField] SpriteRenderer room;
+	[SerializeField] SpriteRenderer[] dayTenObjects;
 
 	IEnumerator FadeBois () {
-		for (float f = 0f; f <= 1f; f += 0.1f) {
+		for (float f = 0f; f <= 2f; f += 0.1f) {
 			for (int i = 0; i < backgroundSpriteRenderers.Length; i++) {
-				backgroundSpriteRenderers [i].color =
-					Color.Lerp (
-						new Color (1f, 1f, 1f, alphas [i]),
-						new Color (1f, 1f, 1f, alphas [i] * 0.1f),
-						f);
+				backgroundSpriteRenderers [i].color = Color.Lerp (
+					new Color (1f, 1f, 1f, alphas [i] * 0.1f),
+					new Color (1f, 1f, 1f, 1f / 255f),
+					f / 2);
 			}
-			yield return new WaitForSeconds (0.1f);
+			for (int i = 0; i < dayTenObjects.Length; i++) {
+				dayTenObjects [i].color = Color.Lerp (
+					dayTenObjects [i].color,
+					new Color (1f, 1f, 1f, 10f / 255f),
+					f / 2);
+			}
+
+			yield return new WaitForSecondsRealtime (0.1f);
 		}
 	}
 
-	public IEnumerator GameEndScreenSetUp() {
+	IEnumerator ShowRoom () {
+		for (float f = 0f; f <= 5f; f += 0.1f) {
+			for (int i = 0; i < backgroundSpriteRenderers.Length; i++) {
+				room.color = Color.Lerp (
+					new Color (1f, 1f, 1f, 0f),
+					new Color (1f, 1f, 1f, 61f / 255f),
+					f / 5f);
+			}
+			yield return new WaitForSecondsRealtime (0.1f);
+		}
+	}
+
+	public void GameEndScreenSetUp() {
+		room.gameObject.SetActive (true);
 		//Make all the Aquarium Backgrounds Fade out. We know at this point they'll be zooemed out.
-		yield return StartCoroutine ("FadeBois");
+		StartCoroutine ("FadeBois");
+		//Show that room
+		StartCoroutine ("ShowRoom");
 	}
 
 
