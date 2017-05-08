@@ -98,9 +98,7 @@ public class DayHandler : MonoBehaviour {
 			if (sceneObjs [i].oHoverTime != -5f) {
 				float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
 
-				if (paralaxPosition <= sceneObjs [i].oXMax &&
-				    paralaxPosition >= sceneObjs [i].oXMin &&
-				    sceneObjs [i].oAtGlass == lookingAtGlass) {
+				if (paralaxPosition <= sceneObjs [i].oXMax && paralaxPosition >= sceneObjs [i].oXMin && (sceneObjs[i].oAtGlass && sceneObjs[i].oAtGlass == lookingAtGlass || !sceneObjs[i].oAtGlass)) {
 
 					//Debug.Log (sceneObjs [i].oHoverTime);
 					sceneObjs [i].oHoverTime += Time.deltaTime / 5f;
