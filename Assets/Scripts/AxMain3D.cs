@@ -589,7 +589,7 @@ public class AxMain3D : MonoBehaviour {
 		}
 		else if (zMove == 5) { // face is walking away
 			if (FaceGroup.transform.localPosition.x < 12) { 
-				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x + (float)0.05, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
+				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x + (float)0.025, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
 				FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,FaceGroup.GetComponent<SpriteRenderer>().color.a-(float)0.01);
 			}
 			else { // end-game triggers
@@ -693,7 +693,7 @@ public class AxMain3D : MonoBehaviour {
 			}
 
 			// imageEffects triggers
-			if (dayStart != 0 && Time.time - dayStart >= 15 && !fxState[0]) { // fish (extra time accounting for fade-in)
+			if (dayStart != 0 && Time.time - dayStart >= 8 && !fxState[0]) { // fish (extra time accounting for fade-in)
 				transform.GetComponent<imageEffects>().FishEyeOn(true);
 				fxState[0] = true;
 			}
@@ -702,7 +702,7 @@ public class AxMain3D : MonoBehaviour {
 				transform.GetComponent<imageEffects>().ChromAbOn(true);
 				fxState[1] = true;
 			}
-			if (dayStart !=0 && Time.time - dayStart >= 35 && !fxState[2]) { // glass
+			if (dayStart !=0 && Time.time - dayStart >= 30 && !fxState[2]) { // glass
 				transform.GetComponent<imageEffects>().glassColorOn(true);
 				fxState[2] = true;
 			}
