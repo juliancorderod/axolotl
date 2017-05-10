@@ -32,9 +32,8 @@ public class AxMain3D : MonoBehaviour {
     bool[] fxState = new bool[3];
     GameObject[] dayObjs = new GameObject[10];
     GameObject UI_title, UI_main, UI_intro, UI_words, UI_prompts, UI_storyL, UI_storyR;
-	Color guiColor = Color.grey;
-	string currentPhrases = "", currentTemplate = "", gameState = "title", introText = "", outroText = ""; // gameState = title, intro, startDay, active, endDay, inter
-	float lastShowDay = 0.0f, lastTickCheck = 0.0f, dayStart = 0.0f, stareTime = 0.0f, holdTime = 0.0f, faceResetX = 0.0f, camResetX = 0.0f;
+	string currentPhrases = "", currentTemplate = "", gameState = "title", outroText = ""; // gameState = title, intro, startDay, active, endDay, inter
+	float lastTickCheck = 0.0f, dayStart = 0.0f, stareTime = 0.0f, holdTime = 0.0f, faceResetX = 0.0f, camResetX = 0.0f, lastDayUIDelay = 0.0f;
     int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 0, currentSent = 0, todaysBlanks, currentBlankInSent, dayBreak = 0; 
 	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, transOnce = false, needsEntry = false, canLeaveInter = false;
 	public bool closeToGlass = false;
@@ -76,6 +75,7 @@ public class AxMain3D : MonoBehaviour {
 			dayPhrasesActive = new List<Phrase>();
 			string[] psp = phs.Split('|');			
 			for (int i=0; i<psp.Length; i++) {
+
 				string[] php = psp[i].Split(','); 
 				if (php[0] == "A") // always available, add directly to active
 					this.dayPhrasesActive.Add(new Phrase(php[0],php[1],php[2]));
@@ -399,7 +399,6 @@ public class AxMain3D : MonoBehaviour {
 		UI_storyR.SetActive(false);
 
 	    // Set up the text for Days
-	    introText = allTmps[0];
 	    UI_intro.GetComponent<UnityEngine.UI.Text>().text = allTmps[0];
 	    outroText = allTmps[11];
 	    for (int i=0;i<10;i++) 
@@ -461,7 +460,6 @@ public class AxMain3D : MonoBehaviour {
 	
 	void Update () {
 		if (gameState == "startDay") {
-			guiColor = Color.Lerp(Color.black, Color.grey, Time.time);
 			if (FadeSquare.GetComponent<SpriteRenderer>().color.a > 0) {
 				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a-fadeInTime);
 			}
@@ -469,14 +467,6 @@ public class AxMain3D : MonoBehaviour {
 				gameState = "active";
 			}
 		}
-		else if (gameState == "endDay") {
-			guiColor = Color.Lerp(Color.grey, Color.black, Time.time);
-		}
-		else if (gameState == "intro") {
-			guiColor = Color.grey;
-		}
-
-		
 
 		// z-axis camera movement
 		if (zMove == 1) { // stepping toward the glass
@@ -589,12 +579,15 @@ public class AxMain3D : MonoBehaviour {
 		}
 		else if (zMove == 5) { // face is walking away
 			if (FaceGroup.transform.localPosition.x < 12) { 
-				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x + (float)0.025, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
-				FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,FaceGroup.GetComponent<SpriteRenderer>().color.a-(float)0.01);
+				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x + (float)0.02, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
+				FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,FaceGroup.GetComponent<SpriteRenderer>().color.a-(float)0.005);
 			}
 			else { // end-game triggers
 				if (!transOnce) {
+					lastDayUIDelay = Time.time;
 					UpdateStrings();
+					UI_storyL.GetComponent<UnityEngine.UI.Text>().color = new Color(1f,1f,1f,0f);
+					UI_storyR.GetComponent<UnityEngine.UI.Text>().color = new Color(1f,1f,1f,0f);
 					UI_storyL.SetActive(true);
 					UI_storyR.SetActive(true);
 					UI_main.SetActive(false);
@@ -602,13 +595,6 @@ public class AxMain3D : MonoBehaviour {
 					GameObject fb = GameObject.Find("/FarBackInsideAquarium");
 					fb.transform.GetComponent<BackgroundFadeIn>().GameEndScreenSetUp();
 				}
-
-				if (UI_storyL.GetComponent<UnityEngine.UI.Text>().color.a < 1)
-					UI_storyL.GetComponent<UnityEngine.UI.Text>().color = new Color(1f,1f,1f,UI_storyL.GetComponent<UnityEngine.UI.Text>().color.a+0.05f);
-
-				if (UI_storyR.GetComponent<UnityEngine.UI.Text>().color.a < 1)
-					UI_storyR.GetComponent<UnityEngine.UI.Text>().color = new Color(1f,1f,1f,UI_storyR.GetComponent<UnityEngine.UI.Text>().color.a+0.05f);
-
 			}
 		}
 		else if (zMove == 6) { // fade from title to intro
@@ -630,6 +616,15 @@ public class AxMain3D : MonoBehaviour {
 
 		}
 
+		if (lastDayUIDelay != 0.0 && Time.time - lastDayUIDelay >= 8 && UI_storyL.GetComponent<UnityEngine.UI.Text>().color.a < 1) {
+			if (UI_storyL.GetComponent<UnityEngine.UI.Text>().color.a < 1)
+				UI_storyL.GetComponent<UnityEngine.UI.Text>().color = new Color(1f,1f,1f,UI_storyL.GetComponent<UnityEngine.UI.Text>().color.a+0.05f);
+
+			if (UI_storyR.GetComponent<UnityEngine.UI.Text>().color.a < 1)
+				UI_storyR.GetComponent<UnityEngine.UI.Text>().color = new Color(1f,1f,1f,UI_storyR.GetComponent<UnityEngine.UI.Text>().color.a+0.05f);
+					
+		}
+
 		// UI Prompts
 		string promptText = "";
 		if (gameState == "title" && zMove == 0) {
@@ -638,7 +633,7 @@ public class AxMain3D : MonoBehaviour {
 		else if (gameState == "intro") {
 			// built-in to intro text
 		}
-		else if (gameState == "outro") {
+		else if (gameState == "outro" && lastDayUIDelay != 0.0 && Time.time - lastDayUIDelay >= 8) {
 			promptText = "( ESCAPE )";	
 		}
 		else if (gameState == "active" && !closeToGlass) {
@@ -753,7 +748,6 @@ public class AxMain3D : MonoBehaviour {
 			    		zMove = 3;
 			    		holdTime = Time.time;
 			    		currentDay = currentDay + 1;
-			    		lastShowDay = Time.time;
 			    		gameState = "endDay";
 			    		transform.GetComponent<MouseParallax>().mouseParallaxControl = false;
 
@@ -793,7 +787,7 @@ public class AxMain3D : MonoBehaviour {
 
 		} 
 		if (Input.GetKey("space")) {
-			if (gameState == "active" && textState != 1) {
+			if (gameState == "active" && textState == 0) {
 				if (zMove == 0 && !closeToGlass ) {
 		    		SendAction("stepFoward");
 		    		zMove = 1;
