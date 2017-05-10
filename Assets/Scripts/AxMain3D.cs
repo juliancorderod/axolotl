@@ -578,7 +578,7 @@ public class AxMain3D : MonoBehaviour {
 			}
 		}
 		else if (zMove == 5) { // face is walking away
-			if (FaceGroup.transform.localPosition.x < 12) { 
+			if (FaceGroup.transform.localPosition.x < 10) { 
 				FaceGroup.transform.localPosition = new Vector3(FaceGroup.transform.localPosition.x + (float)0.02, FaceGroup.transform.localPosition.y, FaceGroup.transform.localPosition.z);	
 				FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,FaceGroup.GetComponent<SpriteRenderer>().color.a-(float)0.005);
 			}
