@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Text;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class AxMain3D : MonoBehaviour {
@@ -328,11 +329,11 @@ public class AxMain3D : MonoBehaviour {
 
 		// Change alpha of tankQuad
 		Color color = TankMat.color;
-		color.a = 1.0f-(0.05f*currentDay);
+		color.a = 1.0f-(0.07f*currentDay);
 		TankMat.color = color;
 
 		// Change alpha of face
-		FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,(float)0.3+(0.05f*currentDay));
+		FaceGroup.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f,(float)0.2+(0.06f*currentDay));
 
 
 		// if we're > day 5, swap position of two
@@ -615,6 +616,14 @@ public class AxMain3D : MonoBehaviour {
 			}
 
 		}
+		else if (zMove == 7) { // fade out from last day to restart
+			if (FadeSquare.GetComponent<SpriteRenderer>().color.a < 1) {
+				FadeSquare.GetComponent<SpriteRenderer>().color = new Color(0f,0f,0f,FadeSquare.GetComponent<SpriteRenderer>().color.a+fadeOutTime);
+			}
+			else {
+				SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+			}
+		}
 
 		if (lastDayUIDelay != 0.0 && Time.time - lastDayUIDelay >= 8 && UI_storyL.GetComponent<UnityEngine.UI.Text>().color.a < 1) {
 			if (UI_storyL.GetComponent<UnityEngine.UI.Text>().color.a < 1)
@@ -634,7 +643,7 @@ public class AxMain3D : MonoBehaviour {
 			// built-in to intro text
 		}
 		else if (gameState == "outro" && lastDayUIDelay != 0.0 && Time.time - lastDayUIDelay >= 8) {
-			promptText = "( ESCAPE )";	
+			promptText = "( ESCAPE ) TO QUIT   ( ENTER ) TO RESTART";	
 		}
 		else if (gameState == "active" && !closeToGlass) {
 			if (textState > -1) {
@@ -693,11 +702,11 @@ public class AxMain3D : MonoBehaviour {
 				fxState[0] = true;
 			}
 
-			if (dayStart != 0 && Time.time - dayStart >= 30 && !fxState[1]) { // chrome
+			if (dayStart != 0 && Time.time - dayStart >= 28 && !fxState[1]) { // chrome
 				transform.GetComponent<imageEffects>().ChromAbOn(true);
 				fxState[1] = true;
 			}
-			if (dayStart !=0 && Time.time - dayStart >= 30 && !fxState[2]) { // glass
+			if (dayStart !=0 && Time.time - dayStart >= 18 && !fxState[2]) { // glass
 				transform.GetComponent<imageEffects>().glassColorOn(true);
 				fxState[2] = true;
 			}
@@ -754,6 +763,7 @@ public class AxMain3D : MonoBehaviour {
 		    		}
 		    		else if (currentDay == maxDays) { // end of game
 		    			transform.GetComponent<MouseParallax>().mouseParallaxControl = false;
+		    			transform.GetComponent<audioManager>().stopTankAmbient();
 		    			zMove = 5;
 		    			gameState = "outro";
 		    			completedText.Add(outroText);
@@ -781,6 +791,13 @@ public class AxMain3D : MonoBehaviour {
 		    else if (gameState == "title") {
 		    	UI_title.SetActive(false);
 	    		zMove = 6; 
+	    	}
+	    	else if (gameState == "outro" && lastDayUIDelay != 0.0 && Time.time - lastDayUIDelay >= 8) { // restart
+				transform.GetComponent<audioManager>().stopTankBubbles();
+				UI_prompts.SetActive(false);
+				UI_storyL.SetActive(false);
+				UI_storyR.SetActive(false);
+	    		zMove = 7;
 	    	}
 
 
