@@ -95,24 +95,26 @@ public class DayHandler : MonoBehaviour {
 	void Update () {
 		for (int i=0; i<sceneObjs.Count; i++) {	
 			//if (Mathf.Abs(sceneObjs[i].oRef.transform.position.x-sceneObjs[i].oPos.x) >= sceneObjs[i].oXThresh && sceneObjs[i].oAtGlass == lookingAtGlass)
-			if (sceneObjs [i].oHoverTime != -4f) {
+			if (sceneObjs [i].oHoverTime != -5f) {
 				float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
 
 				if (paralaxPosition <= sceneObjs [i].oXMax && paralaxPosition >= sceneObjs [i].oXMin && (sceneObjs[i].oAtGlass && sceneObjs[i].oAtGlass == lookingAtGlass || !sceneObjs[i].oAtGlass)) {
 
 					//Debug.Log (sceneObjs [i].oHoverTime);
-					sceneObjs [i].oHoverTime += Time.deltaTime / 5f;
+					sceneObjs [i].oHoverTime += Time.deltaTime / 4f;
 
 					if (sceneObjs [i].oHoverTime >= 1f) {
 						//Ensures the sendPhaseTrigger is called only once.
 						SendPhraseTrigger (sceneObjs [i].oID);
 						sceneObjs [i].oHoverTime = -5f;
 					}
+
+					sceneObjs [i].oGlow.color = Color.Lerp (new Color (1f, 1f, 1f, 0.2f), new Color (1f, 1f, 1f, 1f), sceneObjs [i].oHoverTime);
 				} else {
 					sceneObjs [i].oHoverTime = 0;
+					sceneObjs [i].oGlow.color = new Color (1f, 1f, 1f, 0f);
 				}
 
-				sceneObjs [i].oGlow.color = Color.Lerp (new Color (1f, 1f, 1f, 0f), new Color (1f, 1f, 1f, 1f), sceneObjs [i].oHoverTime);
 			} else {
 				sceneObjs [i].oGlow.color = new Color (1f, 1f, 1f, 0f);
 			}
