@@ -33,10 +33,10 @@ public class AxMain3D : MonoBehaviour {
     bool[] fxState = new bool[3];
     GameObject[] dayObjs = new GameObject[10];
     GameObject UI_title, UI_main, UI_intro, UI_words, UI_prompts, UI_storyL, UI_storyR;
-	string currentPhrases = "", currentTemplate = "", gameState = "title", outroText = ""; // gameState = title, intro, startDay, active, endDay, inter
+	string currentPhrases = "", currentTemplate = "", gameState = "title", outroText = "", lastPrompt = ""; // gameState = title, intro, startDay, active, endDay, inter
 	float lastTickCheck = 0.0f, dayStart = 0.0f, stareTime = 0.0f, holdTime = 0.0f, faceResetX = 0.0f, camResetX = 0.0f, lastDayUIDelay = 0.0f;
     int zMove = 0, currentDay = 1, maxDays = 10, textState = -1, currentIndex = 0, currentSent = 0, todaysBlanks, currentBlankInSent, dayBreak = 0; 
-	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, transOnce = false, needsEntry = false, canLeaveInter = false;
+	bool releaseTyping = false, templateComplete = false, phraseMismatch = false, transOnce = false, needsEntry = false, canLeaveInter = false, confirmExit = false;
 	public bool closeToGlass = false;
 
 	public class Phrase {
@@ -88,30 +88,34 @@ public class AxMain3D : MonoBehaviour {
 	}
 
     void ReadFile(string fn, string[] ar) {
-    	try {
-			StreamReader fr = new StreamReader(fn);
-			string line;
-			int ln = 0;
-			using (fr)
-	         {
-	             do
-	             {
-	                 line = fr.ReadLine();
-	                 if (line != null) {
-	                 	ar[ln] = line;
-	                 	ln++;
-	                 }
-	               		
-	              }
-	             while (line != null);
-	          
-	       	}
-	       }
-	       catch // we should catch file not found exceptions at some point, probably
-         	{
-             //return false;
-         	}
-         
+    		try {
+				StreamReader fr = new StreamReader(fn);
+				string line;
+				int ln = 0;
+				using (fr)
+		         {
+		             do
+		             {
+		                 line = fr.ReadLine();
+		                 if (line != null) {
+		                 	ar[ln] = line;
+		                 	ln++;
+		                 }
+		               		
+		              }
+		             while (line != null);
+		          
+		       	}
+		       }
+		       catch // we should catch file not found exceptions at some point, probably
+	         	{
+	             //return false;
+	         	}
+    }
+
+    string[] ReadString(string inp) {
+    	string[] returnstr = inp.Split('\n');
+    	return returnstr;
     }
 
     void SendAction(string act) {
@@ -226,8 +230,8 @@ public class AxMain3D : MonoBehaviour {
     			todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] += postenter;
     		}
     	}
-    	else if (ltr == KeyCode.Space)
-    		todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] += " ";
+    	//else if (ltr == KeyCode.Space)
+    		//todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] += " ";
     	else if (ltr == KeyCode.Backspace && todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Length > 0) {
     		todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]] = todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Substring(0, todaysTemplate[blankMarkers[currentIndex][0]][blankMarkers[currentIndex][1]].Length - 1);
     	}
@@ -380,9 +384,21 @@ public class AxMain3D : MonoBehaviour {
 		faceResetX = FaceGroup.transform.localPosition.x;
 		camResetX = MainCamera.transform.localPosition.x;
 		
+		// hard coding templates and phrases
+		string hardPhrases = "A,0,jumped|A,0,drank|S,1,floated|T,4,spoke|T,8,laughed|C,6,stared|S,2,waved|T,12,wondered|C,11,unraveled\nA,0,stupid|A,0,happy|T,4,jittery|S,1,stoic|S,2,soulless|C,8,homeless|T,10,confused|C,14,hopeless|T,14,hungry\nS,1,salty|S,2,pungent|A,0,chewy|A,0,furious|T,5,curly|S,3,heavy|T,11,lonely|C,8,empty|C,16,dull|S,4,sinking|T,17,enclosed\nS,1,grasses|S,2,coral|S,3,seaweed|A,0,oceans|T,4,animals|T,10,creatures|T,17,people|C,5,reflections|C,10,you|C,10,I\nS,1,sticky|A,0,curious|A,0,dark|A,0,big|S,2,small|T,6,googly|S,3,carefree|C,6,bitter|T,10,lost|S,4,desolate|T,16,focused|C,10,real\nA,0,squishy|A,0,fast|S,1,tall|A,0,nice|T,5,calm|S,2,small|C,6,anxious|C,10,caged|C,16,buried|S,3,deserted|T,12,detache\nA,0,hands|A,0,freckles|A,0,shape|T,6,softness|T,10,gills|T,14,eyes|T,17,face|T,20,glare|C,6,stillness|C,13,turmoil\nC,3,affections|C,7,worlds|C,15,feelings|C,19,views|C,22,panic|C,26,desperation\nC,3,space|C,8,glass|C,16,air|C,19,water|C,23,silence\nC,7,me|C,7,us|C,7,me";
+		string hardTemplates = "I don't remember how or when it started, but I started seeing it every day...\nWe met across the glass.|Remaining so still, it _.|With its expressionless face, I _ and did not feel judged.\nIts _ eyes drew me into a mystery.|Looking at my reflection, I felt _.|Is it _?\nThere was a single _ rock.|Translucent, _ seaweed.|More _ faces began to stare with it.|But never as long, and never as close.\nWhy do _ stare?|Everyday _ would stay and look at me for hours, judging me.|But staring with _ feels close.\nThe eyes I became addicted to started to look like my own.|They were _, _, and _.|In front of those eyes, I was _.\nThe new log seems _.|Does it feel _ now that the coral has moved?|Does it like its _ home?|Home makes me feel _.\nI wonder if it can recognize me now.|I don’t think I can ever forget its _.|But does it feel the same way?\nI feel like we are beginning to understand each other’s _.|Or maybe I’m just projecting _.|But I’m starting to think that we share in our _.\nThe _ between us started to disappear.|I’m face to face with it.|And I’m still lost in its eyes.\nI looked into its eyes and the mystery became clear.|The words it has been telling _ began to ring in my head.|''Save _.''|''Save _.''\nThe stillness between us became silent words. It was hard to find an understanding in tranquility. But I find myself waiting to hear your silent voice again.";
+
+
 		// populate the template and phrase arrays
-		ReadFile("Assets/template.txt", allTmps);
-	    ReadFile("Assets/phrase.txt", allPhrases);
+		//ReadFile("Assets/template.txt", allTmps);
+	    //ReadFile("Assets/phrase.txt", allPhrases);
+	    allPhrases = ReadString(hardPhrases);
+	    allTmps = ReadString(hardTemplates);
+
+	    /*for (int i=0;i<allTmps.Length;i++)
+	    	print(allTmps[i]);
+	    for (int i=0;i<allPhrases.Length;i++)
+	    	print(allPhrases[i]);*/
 
 	    // Setup our UI Canvas objects
 		UI_title = GameObject.Find("/Canvas/title");
@@ -643,7 +659,7 @@ public class AxMain3D : MonoBehaviour {
 			// built-in to intro text
 		}
 		else if (gameState == "outro" && lastDayUIDelay != 0.0 && Time.time - lastDayUIDelay >= 8) {
-			promptText = "( ESCAPE ) TO QUIT   ( ENTER ) TO RESTART";	
+			promptText = "( ESCAPE ) TO QUIT\n\r( ENTER ) TO RESTART";	
 		}
 		else if (gameState == "active" && !closeToGlass) {
 			if (textState > -1) {
@@ -652,9 +668,9 @@ public class AxMain3D : MonoBehaviour {
 					promptText = "( ENTER ) TO DEPART";	
 				else {
 					if (needsEntry && textState == 1)
-						promptText = "( ENTER ) TO CONFIRM";
+						promptText = "( ENTER ) TO CONFIRM\n\r( SPACE ) TO STARE";
 					else if (needsEntry)
-						promptText = "( ENTER ) TO WRITE";
+						promptText = "( ENTER ) TO WRITE\n\r( SPACE ) TO STARE";
 					else
 						promptText = "( ENTER ) TO PROCEED";
 				}
@@ -667,8 +683,8 @@ public class AxMain3D : MonoBehaviour {
 		else if (gameState == "inter" && zMove != 4) {
 			promptText = " ( ENTER ) FOR NEXT DAY";
 		}
-
-		UI_prompts.GetComponent<UnityEngine.UI.Text>().text = promptText;
+		if (!confirmExit)
+			UI_prompts.GetComponent<UnityEngine.UI.Text>().text = promptText;
 
 
 
@@ -716,11 +732,22 @@ public class AxMain3D : MonoBehaviour {
 		
 		// Keystrokes
 
-		if (Input.GetKey("escape"))
-    		Application.Quit();
+		if (Input.GetKeyUp("escape")) {
+    		if (!confirmExit) {
+ 				lastPrompt = UI_prompts.GetComponent<UnityEngine.UI.Text>().text;
+ 				UI_prompts.GetComponent<UnityEngine.UI.Text>().text = "<color=#FF0000>( ENTER ) TO EXIT</color>\r\n( ESC ) TO RESUME";
+ 				confirmExit = true;
+    		}
+    		else if (confirmExit) {
+	    		UI_prompts.GetComponent<UnityEngine.UI.Text>().text = lastPrompt;
+    			confirmExit = false;
+    		}
+		}	
 
 		if (Input.GetKeyUp("return")) {
 			//print("gameState: "+gameState+" textState: "+textState + " needsEntry: "+needsEntry+" closeToGlass:"+closeToGlass+" templateComplete: "+templateComplete);
+			if (confirmExit)
+				Application.Quit();
 			if (gameState == "active") {
 				if (textState == -1 && !closeToGlass) { // start the day
 		    		transform.GetComponent<MouseParallax>().mouseParallaxControl = true;
@@ -804,7 +831,7 @@ public class AxMain3D : MonoBehaviour {
 
 		} 
 		if (Input.GetKey("space")) {
-			if (gameState == "active" && textState == 0) {
+			if (gameState == "active" && (textState == 0 || textState == 1)) {
 				if (zMove == 0 && !closeToGlass ) {
 		    		SendAction("stepFoward");
 		    		zMove = 1;
@@ -821,6 +848,7 @@ public class AxMain3D : MonoBehaviour {
 		    		stareTime = 0.0f;
 				}
 			}
+
 		}
 		
 		if (releaseTyping) {
