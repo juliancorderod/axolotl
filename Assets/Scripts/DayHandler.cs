@@ -95,7 +95,7 @@ public class DayHandler : MonoBehaviour {
 	void Update () {
 		for (int i=0; i<sceneObjs.Count; i++) {	
 			//if (Mathf.Abs(sceneObjs[i].oRef.transform.position.x-sceneObjs[i].oPos.x) >= sceneObjs[i].oXThresh && sceneObjs[i].oAtGlass == lookingAtGlass)
-			if (sceneObjs [i].oHoverTime != -5f) {
+			if (sceneObjs [i].oHoverTime != -4f) {
 				float paralaxPosition = Mathf.Clamp (Input.mousePosition.x, 0, Screen.width) / Screen.width * 2f - 1f;
 
 				if (paralaxPosition <= sceneObjs [i].oXMax && paralaxPosition >= sceneObjs [i].oXMin && (sceneObjs[i].oAtGlass && sceneObjs[i].oAtGlass == lookingAtGlass || !sceneObjs[i].oAtGlass)) {
@@ -112,7 +112,7 @@ public class DayHandler : MonoBehaviour {
 					sceneObjs [i].oHoverTime = 0;
 				}
 
-				sceneObjs [i].oGlow.color = Color.Lerp (new Color (1f, 1f, 1f, 0f), new Color (1f, 1f, 1f, 0.9f), sceneObjs [i].oHoverTime);
+				sceneObjs [i].oGlow.color = Color.Lerp (new Color (1f, 1f, 1f, 0f), new Color (1f, 1f, 1f, 1f), sceneObjs [i].oHoverTime);
 			} else {
 				sceneObjs [i].oGlow.color = new Color (1f, 1f, 1f, 0f);
 			}

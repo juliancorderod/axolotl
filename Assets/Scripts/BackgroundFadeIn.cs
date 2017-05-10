@@ -93,7 +93,7 @@ public class BackgroundFadeIn : MonoBehaviour {
 
 		if (previousCloseToGlass != am.closeToGlass) {
 			if (am.closeToGlass == true) {
-				lerpTime += Time.deltaTime / 5f;
+				lerpTime += Time.deltaTime / 3f;
 				for (int i = 0; i < backgroundSpriteRenderers.Length; i++) {
 					backgroundSpriteRenderers [i].color =
 						Color.Lerp (
