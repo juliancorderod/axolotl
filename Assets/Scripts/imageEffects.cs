@@ -28,6 +28,7 @@ public class imageEffects : MonoBehaviour {
 	void Update () {
 
 		//debug triggers
+		/*
 		if(Input.GetKey(KeyCode.Alpha1)){
 			FishEyeOn(true);
 		}
@@ -44,13 +45,13 @@ public class imageEffects : MonoBehaviour {
 			ChromAbOn(false);
 			glassColorOn (false);
 		}
-
+		*/
 
 
 		if(turnFishEyeOn){
 
 			fishEyeCounter+= Time.deltaTime;
-			tankCam.GetComponent<Fisheye>().strengthY = (Mathf.Sin((fishEyeCounter-15f) * 0.1f)/8f) + 0.13f;
+			//tankCam.GetComponent<Fisheye>().strengthY = (Mathf.Sin((fishEyeCounter-15f) * 0.1f)/8f) + 0.13f;
 			mainCam.GetComponent<Fisheye>().strengthY += 0.003f * Time.deltaTime;
 			mainCam.GetComponent<Fisheye>().strengthX += 0.001f * Time.deltaTime;
 
